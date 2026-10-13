@@ -21,6 +21,11 @@ import LamaModal from './LamaModal';
 import GenerateReportModal from './GenerateReportModal';
 import { generateComprehensivePdf } from '../utils/reportGenerator';
 import TreatmentModal from './TreatmentModal';
+import TriageAssessmentView from './TriageAssessmentView';
+import StepwiseManagementView from './StepwiseManagementView';
+import LabTestTrackerView from './LabTestTrackerView';
+import OngoingTreatmentManager from './OngoingTreatmentManager';
+import NextRecommendationsAIConsultation from './NextRecommendationsAIConsultation';
 
 import { useCases } from '../CaseContext';
 import { useAuth } from '../AuthContext';
@@ -33,13 +38,17 @@ interface EncounterViewProps {
 }
 
 // --- TABS ---
-type ActiveTab = 'case' | 'treatment' | 'progress' | 'analysis' | 'reports' | 'sharing';
+type ActiveTab = 'case' | 'triage' | 'stepwise' | 'labs' | 'treatment' | 'next-rec' | 'progress' | 'analysis' | 'reports' | 'sharing';
 
 const TABS: { id: ActiveTab; name: string; icon: React.ReactNode }[] = [
     { id: 'case', name: 'Patient Case', icon: <UserGroupIcon className="h-5 w-5 mr-2"/> },
-    { id: 'treatment', name: 'Diagnosis & Treatment', icon: <PillIcon className="h-5 w-5 mr-2"/> },
+    { id: 'triage', name: 'Triage (1–5)', icon: <ExclamationCircleIcon className="h-5 w-5 mr-2"/> },
+    { id: 'stepwise', name: 'Stepwise Care', icon: <ClipboardDocumentListIcon className="h-5 w-5 mr-2"/> },
+    { id: 'labs', name: 'Labs & Tests', icon: <BeakerIcon className="h-5 w-5 mr-2"/> },
+    { id: 'treatment', name: 'Diagnoses & Rx', icon: <PillIcon className="h-5 w-5 mr-2"/> },
+    { id: 'next-rec', name: 'Next Recs AI', icon: <SparklesIcon className="h-5 w-5 mr-2"/> },
     { id: 'progress', name: 'Daily Progress', icon: <ChartPieIcon className="h-5 w-5 mr-2"/> },
-    { id: 'analysis', name: 'AI Analysis', icon: <SparklesIcon className="h-5 w-5 mr-2"/> },
+    { id: 'analysis', name: 'AI Diagnostics', icon: <CpuChipIcon className="h-5 w-5 mr-2"/> },
     { id: 'reports', name: 'Reports', icon: <DocumentTextIcon className="h-5 w-5 mr-2"/> },
     { id: 'sharing', name: 'Sharing', icon: <UserGroupIcon className="h-5 w-5 mr-2"/> },
 ];
@@ -132,9 +141,17 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
     const renderTabContent = () => {
         switch (activeTab) {
             case 'case':
-                return <PatientCaseTab encounter={encounter} setEncounter={setEncounter} onGenerateDiagnoses={handleGenerateDiagnoses} isLoading={isLoading} error={error} isLimitedRole={isLimitedRole} onNext={handleNext} />;
+                return <PatientCaseTab encounter={encounter} setEncounter={setEncounter} onGenerateDiagnoses={handleGenerateDiagnoses} isLoading={isLoading} error={error} isLimitedRole={isLimitedRole} onNext={() => setActiveTab('triage')} onOpenTriage={() => setActiveTab('triage')} />;
+            case 'triage':
+                return <TriageAssessmentView encounter={encounter} onUpdateEncounter={(updated) => setEncounter(updated)} onNext={() => setActiveTab('stepwise')} />;
+            case 'stepwise':
+                return <StepwiseManagementView encounter={encounter} onUpdateEncounter={(updated) => setEncounter(updated)} onNext={() => setActiveTab('labs')} />;
+            case 'labs':
+                return <LabTestTrackerView encounter={encounter} onUpdateEncounter={(updated) => setEncounter(updated)} onNext={() => setActiveTab('treatment')} />;
             case 'treatment':
-                return <DiagnosisTreatmentTab encounter={encounter} setEncounter={setEncounter} onNext={handleNext} />;
+                return <DiagnosisTreatmentTab encounter={encounter} setEncounter={setEncounter} onNext={() => setActiveTab('next-rec')} />;
+            case 'next-rec':
+                return <NextRecommendationsAIConsultation encounter={encounter} onUpdateEncounter={(updated) => setEncounter(updated)} onNext={() => setActiveTab('progress')} />;
             case 'progress':
                 return <ProgressMonitoringTab encounter={encounter} setEncounter={setEncounter} isLimitedRole={isLimitedRole} onNext={handleNext} />;
             case 'analysis':
@@ -165,6 +182,26 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
                             }`}>
                                 {encounter.status}
                             </span>
+                            {encounter.triage && (
+                                <button
+                                    onClick={() => setActiveTab('triage')}
+                                    className={`text-[10px] md:text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl border flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-sm ${
+                                        encounter.triage.level === 1 ? 'bg-rose-500/10 text-rose-600 border-rose-300' :
+                                        encounter.triage.level === 2 ? 'bg-amber-500/10 text-amber-600 border-amber-300' :
+                                        encounter.triage.level === 3 ? 'bg-yellow-500/10 text-yellow-600 border-yellow-300' :
+                                        encounter.triage.level === 4 ? 'bg-emerald-500/10 text-emerald-600 border-emerald-300' :
+                                        'bg-sky-500/10 text-sky-600 border-sky-300'
+                                    }`}
+                                >
+                                    <span className={`w-2 h-2 rounded-full ${
+                                        encounter.triage.level === 1 ? 'bg-rose-500 animate-ping' :
+                                        encounter.triage.level === 2 ? 'bg-amber-500 animate-pulse' :
+                                        encounter.triage.level === 3 ? 'bg-yellow-500' :
+                                        encounter.triage.level === 4 ? 'bg-emerald-500' : 'bg-sky-500'
+                                    }`}></span>
+                                    ESI Level {encounter.triage.level}: {encounter.triage.acuityName.split(' ')[0]} ({encounter.triage.targetTimeMinutes === 0 ? 'STAT' : `<${encounter.triage.targetTimeMinutes}m`})
+                                </button>
+                            )}
                         </div>
                         <p className="text-slate-400 text-[10px] md:text-sm font-semibold flex flex-wrap items-center gap-2 md:gap-3 uppercase tracking-widest">
                             <span className="text-slate-300">Case ID:</span> {encounter.id.slice(0, 12)}...
@@ -297,8 +334,9 @@ interface PatientCaseTabProps {
     error: string | null;
     isLimitedRole?: boolean;
     onNext: () => void;
+    onOpenTriage?: () => void;
 }
-const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter, onGenerateDiagnoses, isLoading, error, isLimitedRole, onNext }) => {
+const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter, onGenerateDiagnoses, isLoading, error, isLimitedRole, onNext, onOpenTriage }) => {
     const investigationTemplates = {
         "CBC": "Hemoglobin: \nWBC: \nPlatelets: ",
         "Renal Panel": "Sodium: \nPotassium: \nChloride: \nBicarbonate: \nBUN: \nCreatinine: ",
@@ -418,6 +456,30 @@ const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter
             
             {/* Left Column: Demographics & Vitals */}
             <div className="lg:col-span-4 space-y-8">
+                {encounter.triage && (
+                    <div 
+                        onClick={onOpenTriage}
+                        className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-lg cursor-pointer hover:border-cyan-500/50 transition-all group"
+                    >
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">Emergency Triage (ESI 1–5)</span>
+                            <span className="text-[10px] text-slate-400 group-hover:text-cyan-400 font-bold">Open Full Triage ➔</span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                            <span className={`w-3 h-3 rounded-full ${
+                                encounter.triage.level === 1 ? 'bg-rose-500 animate-ping' :
+                                encounter.triage.level === 2 ? 'bg-amber-500 animate-pulse' :
+                                'bg-yellow-500'
+                            }`}></span>
+                            <div className="text-base font-black">
+                                Level {encounter.triage.level}: {encounter.triage.acuityName.split(' ')[0]}
+                            </div>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 ml-auto">
+                                {encounter.triage.targetTimeMinutes === 0 ? 'STAT' : `< ${encounter.triage.targetTimeMinutes}m`}
+                            </span>
+                        </div>
+                    </div>
+                )}
                 <div className="bg-primary-100 p-6 md:p-8 rounded-2xl md:rounded-[3rem] border border-slate-100 shadow-sm animate-slide-up" style={{ animationDelay: '0ms' }}>
                     <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
                         <div className="p-2.5 md:p-3 bg-brand-50 text-brand-600 rounded-xl md:rounded-2xl">
@@ -926,7 +988,15 @@ const DiagnosisTreatmentTab: React.FC<DiagnosisTreatmentTabProps> = ({ encounter
                     initialTreatment={editingTreatment}
                 />
             )}
-            <NextStepButton onClick={onNext} label="Next: Progress Monitoring" />
+
+            <div className="mt-10">
+                <OngoingTreatmentManager 
+                    encounter={encounter} 
+                    onUpdateEncounter={(updated) => setEncounter(updated)} 
+                />
+            </div>
+
+            <NextStepButton onClick={onNext} label="Next: Next Recommendations AI" />
 
         </div>
     );

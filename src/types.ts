@@ -1,4 +1,4 @@
-﻿
+
 export interface Vitals {
     temp: string; // Temperature
     hr: string;   // Heart Rate
@@ -22,10 +22,24 @@ export interface PatientData {
     investigations: { [key: string]: string }; // e.g., { "CBC": "WBC 12.5...", "TSH": "TSH 5.2..." }
 }
 
+export interface TreatmentChangeRecord {
+    id: string;
+    timestamp: number;
+    previousDrug: string;
+    previousDosage: string;
+    newDrug: string;
+    newDosage: string;
+    reasonCategory: 'Renal / Hepatic Clearance' | 'Adverse Reaction / Allergy' | 'Treatment Failure / Deterioration' | 'Culture / Sensitivity Optimization' | 'Guideline Escalation' | 'Hemodynamic Shift';
+    clinicalRationale: string;
+    prescribingClinician?: string;
+}
+
 export interface Treatment {
     id: string;
     drugName: string;
     dosage: string;
+    route?: 'Oral (PO)' | 'Intravenous (IV)' | 'Subcutaneous (SC)' | 'Inhalation' | 'Sublingual (SL)' | 'Intramuscular (IM)' | 'Topical' | 'Other';
+    frequency?: 'STAT / Once' | 'Once Daily (QD)' | 'Twice Daily (BID)' | 'Three Times Daily (TID)' | 'Four Times Daily (QID)' | 'Every 8 Hours (q8h)' | 'Every 12 Hours (q12h)' | 'Continuous Infusion' | 'PRN (As Needed)';
     duration: string;
     line: 'First-line' | 'Second-line' | 'Empirical' | 'Combination' | 'Supportive';
     source: 'AI-Recommended' | 'Clinician-Decided';
@@ -33,7 +47,76 @@ export interface Treatment {
     guidelineFollowed?: boolean;
     deviationReason?: string;
     isActive: boolean;
+    status?: 'Active' | 'Titrating' | 'Paused' | 'Discontinued' | 'Completed';
+    changeHistory?: TreatmentChangeRecord[];
     history: { date: number; reason: string }[];
+}
+
+export type TriageLevel = 1 | 2 | 3 | 4 | 5;
+
+export interface TriageAssessment {
+    level: TriageLevel;
+    acuityName: 'Resuscitation (Immediate)' | 'Emergent (High Risk)' | 'Urgent (2+ Resources)' | 'Less Urgent (1 Resource)' | 'Non-Urgent (0 Resources)';
+    colorCode: 'red' | 'orange' | 'yellow' | 'green' | 'blue';
+    targetTimeMinutes: number; // e.g. 0, 15, 60, 120, 240
+    avpu: 'Alert' | 'Verbal' | 'Pain' | 'Unresponsive';
+    painScore: number; // 0 - 10
+    redFlags: string[];
+    vitalTriggers: string[];
+    recommendedResources: string[];
+    immediateActions: string[];
+    clinicalRationale: string;
+    lastAssessed: number;
+    assessedBy?: string;
+}
+
+export interface ManagementStep {
+    id: string;
+    phase: 1 | 2 | 3 | 4 | 5;
+    phaseTitle: string; // e.g. 'Phase 1: Immediate Stabilization (0-15m)'
+    title: string;
+    description: string;
+    priority: 'STAT / Critical' | 'Urgent' | 'Standard' | 'Conditional';
+    status: 'Pending' | 'In Progress' | 'Completed';
+    completedAt?: number;
+    completedBy?: string;
+    clinicalNotes?: string;
+    guidelineRef?: string;
+}
+
+export type LabCategory = 'Biomarkers' | 'Hematology' | 'Chemistry & Metabolic' | 'Coagulation' | 'Blood Gas & Acid-Base' | 'Microbiology' | 'Imaging & ECG' | 'Other';
+export type LabStatus = 'Ordered' | 'Sample Collected' | 'In Lab Processing' | 'Resulted' | 'Critical Flag';
+
+export interface LabTestOrder {
+    id: string;
+    testName: string;
+    category: LabCategory;
+    orderedAt: number;
+    status: LabStatus;
+    resultValue?: string;
+    unit?: string;
+    referenceRange?: string;
+    isAbnormal?: boolean;
+    isCritical?: boolean;
+    criticalAlertMessage?: string;
+    resultedAt?: number;
+    notes?: string;
+}
+
+export interface ConsultationMessage {
+    id: string;
+    sender: 'Clinician' | 'MediDx AI Panel';
+    text: string;
+    timestamp: number;
+    icd11References?: string[];
+    dsm5References?: string[];
+    guidelineCitations?: string[];
+    recommendedActions?: {
+        immediate24h: string[];
+        milestones48h: string[];
+        specialtyConsults: string[];
+        dsm5PsychiatricNotes?: string;
+    };
 }
 
 export interface Diagnosis {
@@ -84,9 +167,13 @@ export interface MedicalReport {
 export interface Encounter {
     id: string; // Case ID / Serial Number
     patientData: PatientData;
+    triage?: TriageAssessment;
     provisionalDiagnoses: Diagnosis[];
     finalDiagnosis: Diagnosis | null;
     treatments: Treatment[];
+    stepwisePlan?: ManagementStep[];
+    labTracker?: LabTestOrder[];
+    consultationMessages?: ConsultationMessage[];
     timestamp: number; // Date of entry
     progressNotes: ProgressNote[];
     vitalsHistory: VitalsRecord[];
