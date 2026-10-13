@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState, useCallback, useEffect } from 'react';
 
 import { PatientData, Diagnosis, Encounter, DoctorDetails, ReportModules, Treatment, ProgressNote, VitalsRecord, AIRecommendation } from './types';
@@ -38,7 +38,7 @@ const BLANK_PATIENT_DATA: PatientData = {
 };
 
 const AppContent: React.FC = () => {
-    const { user, profile, signIn, logout, updateProfile, loading: authLoading } = useAuth();
+    const { user, profile, signIn, signInAsGuest, logout, updateProfile, loading: authLoading } = useAuth();
     const { encounters, loading: casesLoading, createEncounter, updateEncounter, deleteEncounter } = useCases();
     
     const [activeView, setActiveView] = useState<'records' | 'encounter' | 'clinicians' | 'dashboard'>('dashboard');
@@ -93,12 +93,19 @@ const AppContent: React.FC = () => {
                     <p className="text-sm md:text-base text-primary-600 mb-8 md:mb-10 font-medium">Professional Clinical Decision Support System for Modern Healthcare.</p>
                     <button 
                         onClick={signIn}
-                        className="w-full bg-brand-500 text-white font-bold py-3.5 md:py-4 rounded-xl shadow-[0_0_30px_rgba(0,213,255,0.3)] hover:shadow-[0_0_50px_rgba(0,213,255,0.5)] hover:bg-brand-400 transition-all active:scale-95 flex items-center justify-center gap-3 text-sm md:text-base"
+                        className="w-full bg-brand-500 text-white font-bold py-3.5 md:py-4 rounded-xl shadow-[0_0_30px_rgba(0,213,255,0.3)] hover:shadow-[0_0_50px_rgba(0,213,255,0.5)] hover:bg-brand-400 transition-all active:scale-95 flex items-center justify-center gap-3 text-sm md:text-base mb-3"
                     >
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5 md:w-6 md:h-6" alt="Google" />
-                        Sign in as Clinician
+                        Sign in with Google
                     </button>
-                    <p className="mt-6 md:mt-8 text-[10px] md:text-xs text-white0 uppercase tracking-widest font-bold">Secure Medical Authentication</p>
+                    <button 
+                        onClick={signInAsGuest}
+                        className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 md:py-3.5 rounded-xl border border-white/20 transition-all active:scale-95 flex items-center justify-center gap-2 text-xs md:text-sm"
+                    >
+                        <span>⚡</span>
+                        Continue as Demo Clinician (Instant Access)
+                    </button>
+                    <p className="mt-6 md:mt-8 text-[10px] md:text-xs text-white/50 uppercase tracking-widest font-bold">Secure Medical Decision Support</p>
                 </div>
             </div>
         );

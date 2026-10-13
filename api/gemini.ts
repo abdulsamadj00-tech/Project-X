@@ -3,10 +3,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Models to try in order of preference (fallback chain)
 // gemini-flash-latest is the stable alias that always points to the latest flash model
 const MODELS = [
+    'gemini-3.5-flash',
+    'gemini-3.6-flash',
+    'gemini-3-flash-preview',
+    'gemini-3.1-flash-lite',
+    'gemini-3.1-flash-lite-preview',
+    'gemini-flash-latest',
     'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-1.5-pro',
+    'gemini-1.5-flash'
 ];
 
 async function callGemini(apiKey: string, modelName: string, requestBody: any): Promise<{ ok: boolean; status: number; data?: any; error?: string }> {
