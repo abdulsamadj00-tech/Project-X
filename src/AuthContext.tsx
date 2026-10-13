@@ -49,123 +49,120 @@ export const MOCK_PROFILE: DoctorProfile = {
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [profile, setProfile] = useState<DoctorProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Default to Guest Clinician so the app opens immediately without hanging on an infinite spinner
+    const [user, setUser] = useState<User | null>(() => {
+        const stored = localStorage.getItem('medidx_user');
+        if (stored) {
+            try { return JSON.parse(stored); } catch {}
+        }
+        return MOCK_USER;
+    });
+
+    const [profile, setProfile] = useState<DoctorProfile | null>(() => {
+        const stored = localStorage.getItem('medidx_profile');
+        if (stored) {
+            try { return JSON.parse(stored); } catch {}
+        }
+        return MOCK_PROFILE;
+    });
+
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Check if user previously selected Guest / Demo Clinician mode
-        const isGuest = localStorage.getItem('medidx_guest_mode') === 'true';
-        if (isGuest) {
-            const savedProfile = localStorage.getItem('medidx_guest_profile');
-            setUser(MOCK_USER);
-            setProfile(savedProfile ? JSON.parse(savedProfile) : MOCK_PROFILE);
-            setLoading(false);
-            return;
-        }
-
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            setUser(firebaseUser);
-            if (firebaseUser) {
-                try {
-                    const docRef = doc(db, 'doctors', firebaseUser.uid);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        setProfile(docSnap.data() as DoctorProfile);
-                    } else {
-                        const newProfile: DoctorProfile = {
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email || '',
-                            name: firebaseUser.displayName || 'Doctor',
-                            role: 'Clinician',
-                            licenseNumber: 'N/A',
-                            specialty: 'General Medicine',
-                            hospital: 'N/A',
-                            position: 'Clinician',
-                            institution: 'N/A',
-                            isProfileComplete: false,
-                            createdAt: Date.now(),
-                            lastLogin: Date.now(),
-                            status: 'Active'
-                        };
-                        await setDoc(docRef, newProfile);
-                        setProfile(newProfile);
-                    }
-                } catch (error) {
-                    console.warn("Could not sync profile with Firestore, using local session:", error);
-                    setProfile({
+        // Listen to Firebase auth changes if the user signs in with Google
+        let unsubscribe = () => {};
+        try {
+            unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+                if (firebaseUser) {
+                    setUser(firebaseUser);
+                    localStorage.setItem('medidx_user', JSON.stringify({
                         uid: firebaseUser.uid,
-                        email: firebaseUser.email || '',
-                        name: firebaseUser.displayName || 'Doctor',
-                        role: 'Owner',
-                        licenseNumber: 'MD-TEMP',
-                        specialty: 'General Medicine',
-                        hospital: 'Clinical Practice',
-                        position: 'Clinician',
-                        institution: 'MediDx Network',
-                        isProfileComplete: true,
-                        createdAt: Date.now(),
-                        lastLogin: Date.now(),
-                        status: 'Active'
-                    });
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName
+                    }));
+
+                    try {
+                        const docRef = doc(db, 'doctors', firebaseUser.uid);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const p = docSnap.data() as DoctorProfile;
+                            setProfile(p);
+                            localStorage.setItem('medidx_profile', JSON.stringify(p));
+                        } else {
+                            const newProfile: DoctorProfile = {
+                                uid: firebaseUser.uid,
+                                email: firebaseUser.email || '',
+                                name: firebaseUser.displayName || 'Doctor',
+                                role: 'Clinician',
+                                licenseNumber: 'N/A',
+                                specialty: 'General Medicine',
+                                hospital: 'N/A',
+                                position: 'Clinician',
+                                institution: 'N/A',
+                                isProfileComplete: true,
+                                createdAt: Date.now(),
+                                lastLogin: Date.now(),
+                                status: 'Active'
+                            };
+                            await setDoc(docRef, newProfile).catch(() => {});
+                            setProfile(newProfile);
+                            localStorage.setItem('medidx_profile', JSON.stringify(newProfile));
+                        }
+                    } catch (error) {
+                        console.warn("Could not sync profile with Firestore, using local profile:", error);
+                    }
                 }
-            } else {
-                setProfile(null);
-            }
-            setLoading(false);
-        });
+            });
+        } catch (e) {
+            console.warn("Firebase auth listener notice:", e);
+        }
 
         return () => unsubscribe();
     }, []);
 
     const signInAsGuest = () => {
-        localStorage.setItem('medidx_guest_mode', 'true');
         setUser(MOCK_USER);
         setProfile(MOCK_PROFILE);
+        localStorage.setItem('medidx_user', JSON.stringify(MOCK_USER));
+        localStorage.setItem('medidx_profile', JSON.stringify(MOCK_PROFILE));
     };
 
     const signIn = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
         } catch (error: any) {
-            console.error("Sign in error:", error);
-            // If Google popup fails (domain not whitelisted, blocked popup, etc.), seamlessly log in as Guest
-            const shouldFallback = window.confirm(
-                `Google Sign-In note: ${error.message || 'Popup blocked or domain not configured'}\n\nWould you like to continue in Demo Clinician mode with full access?`
-            );
-            if (shouldFallback) {
-                signInAsGuest();
-            }
+            console.warn("Google sign-in popup notice:", error.message || error);
+            alert(`Google Sign-In note: ${error.message || 'Pop-up blocked or domain not configured'}\n\nContinuing with Demo Clinician profile.`);
+            signInAsGuest();
         }
     };
 
     const logout = async () => {
-        localStorage.removeItem('medidx_guest_mode');
-        localStorage.removeItem('medidx_guest_profile');
-        setUser(null);
-        setProfile(null);
+        localStorage.removeItem('medidx_user');
+        localStorage.removeItem('medidx_profile');
+        setUser(MOCK_USER);
+        setProfile(MOCK_PROFILE);
         try {
             await signOut(auth);
         } catch (error) {
-            console.error("Logout error:", error);
+            console.warn("Logout notice:", error);
         }
     };
 
     const updateProfile = async (data: Partial<DoctorProfile>) => {
-        if (!user) return;
         const updated = profile ? { ...profile, ...data } : null;
         setProfile(updated);
-
-        if (user.uid === MOCK_USER.uid) {
-            localStorage.setItem('medidx_guest_profile', JSON.stringify(updated));
-            return;
+        if (updated) {
+            localStorage.setItem('medidx_profile', JSON.stringify(updated));
         }
 
-        try {
-            const docRef = doc(db, 'doctors', user.uid);
-            await updateDoc(docRef, data);
-        } catch (error) {
-            console.warn("Update profile error in Firestore, saved locally:", error);
+        if (user && user.uid !== MOCK_USER.uid) {
+            try {
+                const docRef = doc(db, 'doctors', user.uid);
+                await updateDoc(docRef, data);
+            } catch (error) {
+                console.warn("Update profile error in Firestore, saved locally:", error);
+            }
         }
     };
 

@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState } from 'react';
 import { Diagnosis } from '../types';
 import { 
@@ -42,12 +42,14 @@ const DiagnosisCard: React.FC<DiagnosisCardProps> = ({ diagnosis, index }) => {
                     </div>
                     <div>
                         <h3 className={`text-2xl font-bold tracking-tight font-display transition-colors duration-500 ${isOpen ? 'text-slate-900' : 'text-slate-600'}`}>{diagnosis.diagnosisName}</h3>
-                        <div className="flex items-center gap-4 mt-2">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">ICD: {diagnosis.icdCode || 'N/A'}</span>
-                            <span className="text-slate-200 text-[10px]">•</span>
-                            <div className="flex items-center gap-2">
-                                <SparklesIcon className={`h-3.5 w-3.5 transition-colors duration-500 ${isOpen ? 'text-brand-500' : 'text-slate-300'}`} />
-                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${isOpen ? 'text-brand-600' : 'text-slate-400'}`}>AI Confidence</span>
+                        <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-2.5">
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[11px] font-extrabold tracking-wide bg-brand-500/15 text-brand-500 border border-brand-500/30 shadow-sm">
+                                {diagnosis.icdCode || 'ICD-11 Standard'}
+                            </span>
+                            <span className="text-slate-300 text-[10px]">•</span>
+                            <div className="flex items-center gap-1.5">
+                                <SparklesIcon className={`h-3.5 w-3.5 transition-colors duration-500 ${isOpen ? 'text-brand-500' : 'text-slate-400'}`} />
+                                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${isOpen ? 'text-brand-600' : 'text-slate-400'}`}>Clinical Probability</span>
                             </div>
                         </div>
                     </div>
