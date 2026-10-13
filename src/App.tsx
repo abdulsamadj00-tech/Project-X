@@ -39,7 +39,7 @@ const BLANK_PATIENT_DATA: PatientData = {
 
 const AppContent: React.FC = () => {
     const { user, profile, signIn, signInAsGuest, logout, updateProfile, loading: authLoading } = useAuth();
-    const { encounters, loading: casesLoading, createEncounter, updateEncounter, deleteEncounter } = useCases();
+    const { encounters, loading: casesLoading, createEncounter, addRandomCase, updateEncounter, deleteEncounter } = useCases();
     
     const [activeView, setActiveView] = useState<'records' | 'encounter' | 'clinicians' | 'dashboard'>('dashboard');
     const [selectedEncounterId, setSelectedEncounterId] = useState<string | null>(null);
@@ -139,6 +139,22 @@ const AppContent: React.FC = () => {
         }
     };
 
+    const handleAddRandomCase = async (presetIndex?: number) => {
+        try {
+            const id = await addRandomCase(presetIndex);
+            if (id) {
+                setSelectedEncounterId(id);
+                setActiveView('encounter');
+                toast.success("Random clinical case loaded with complete history, triage & care pathway.");
+            } else {
+                toast.error("Failed to load random case.");
+            }
+        } catch (error) {
+            console.error("Error creating random encounter:", error);
+            toast.error("An unexpected error occurred while loading random case.");
+        }
+    };
+
     const handleUpdateEncounter = async (updatedEncounter: Encounter) => {
         setIsSaving(true);
         try {
@@ -205,6 +221,7 @@ const AppContent: React.FC = () => {
                 onOpenProfile={() => setIsProfileModalOpen(true)}
                 onNavigate={navigateTo}
                 onNewEncounter={handleNewEncounter}
+                onAddRandomCase={handleAddRandomCase}
                 onOpenPricing={() => setIsPricingModalOpen(true)}
                 onLogout={logout}
                 onSwitchAccount={handleSwitchAccount}
@@ -223,6 +240,7 @@ const AppContent: React.FC = () => {
                                 setSelectedEncounterId(id);
                                 setActiveView('encounter');
                             }}
+                            onAddRandomCase={handleAddRandomCase}
                         />
                     ) : activeView === 'records' ? (
                         <PatientRecordsView 
@@ -232,6 +250,7 @@ const AppContent: React.FC = () => {
                                 setActiveView('encounter');
                             }}
                             onDeleteEncounter={handleDeleteEncounter}
+                            onAddRandomCase={handleAddRandomCase}
                         />
                     ) : activeView === 'clinicians' ? (
                         <ClinicianManagement />

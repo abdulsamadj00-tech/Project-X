@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState } from 'react';
 import { ChevronDownIcon } from './icons';
 
@@ -20,7 +20,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ title, icon, children, initialO
                 aria-expanded={isOpen}
             >
                 <div className="flex items-center">
-                    <div className={`p-4 rounded-2xl mr-6 transition-all duration-700 ${isOpen ? 'bg-brand-500 text-white shadow-[0_0_25px_rgba(0,213,255,0.3)] scale-110 rotate-3' : 'bg-primary-200/50 text-white0 group-hover:scale-105'}`}>
+                    <div className={`p-4 rounded-2xl mr-6 transition-all duration-700 ${isOpen ? 'bg-brand-500 text-white shadow-[0_0_25px_rgba(0,213,255,0.3)] scale-110 rotate-3' : 'bg-primary-200/50 text-primary-400 group-hover:scale-105'}`}>
                         {React.cloneElement(icon as React.ReactElement<any>, { className: "h-6 w-6" })}
                     </div>
                     <div>
@@ -29,7 +29,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ title, icon, children, initialO
                     </div>
                 </div>
                 <div className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-500 ${isOpen ? 'bg-brand-500/10 border-brand-500/20 rotate-180' : 'bg-primary-200/50 border-primary-300/30'}`}>
-                    <ChevronDownIcon className={`h-5 w-5 transition-colors duration-500 ${isOpen ? 'text-brand-400' : 'text-white0'}`} />
+                    <ChevronDownIcon className={`h-5 w-5 transition-colors duration-500 ${isOpen ? 'text-brand-400' : 'text-primary-400'}`} />
                 </div>
             </button>
             <div className={`transition-all duration-700 ease-in-out ${isOpen ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>

@@ -92,31 +92,31 @@ export const ClinicalCalculatorsModal: React.FC<ClinicalCalculatorsModalProps> =
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in">
+            <div className="bg-primary-100 border border-primary-300/40 rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-primary-900">
                 {/* Header */}
-                <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/90 shrink-0">
+                <div className="p-5 sm:p-6 border-b border-primary-300/30 flex items-center justify-between bg-primary-100/95 shrink-0">
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                            <span className="w-2 h-2 rounded-full bg-brand-400"></span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-brand-400">
                                 Bedside Decision Support
                             </span>
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-black text-white font-display tracking-tight mt-0.5">
+                        <h2 className="text-xl sm:text-2xl font-black text-primary-900 font-display tracking-tight mt-0.5">
                             Clinical Risk Calculators
                         </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-9 h-9 rounded-xl bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                        className="w-9 h-9 rounded-xl bg-primary-200/60 text-primary-400 hover:text-primary-900 hover:bg-primary-300/60 border border-primary-300/30 flex items-center justify-center transition-colors"
                     >
                         ✕
                     </button>
                 </div>
 
                 {/* Minimalist Calculator Nav Bar */}
-                <div className="flex items-center gap-1.5 p-2 bg-slate-950/60 border-b border-slate-800/80 overflow-x-auto scrollbar-hide shrink-0">
+                <div className="flex items-center gap-1.5 p-2 bg-primary-200/50 border-b border-primary-300/30 overflow-x-auto scrollbar-hide shrink-0">
                     {[
                         { id: 'news2', label: 'NEWS2 (Deterioration)', badge: `${news2Result.totalScore}` },
                         { id: 'timi', label: 'TIMI (NSTEMI Risk)', badge: `${timiResult.score}/7` },
@@ -130,13 +130,13 @@ export const ClinicalCalculatorsModal: React.FC<ClinicalCalculatorsModalProps> =
                             onClick={() => setActiveCalc(tab.id as CalculatorKey)}
                             className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                                 activeCalc === tab.id
-                                    ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
-                                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
+                                    ? 'bg-brand-500 text-white shadow-md font-black'
+                                    : 'text-primary-600 hover:bg-primary-300/40 hover:text-primary-900'
                             }`}
                         >
                             <span>{tab.label}</span>
                             <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
-                                activeCalc === tab.id ? 'bg-slate-950/40 text-cyan-200' : 'bg-slate-800 text-slate-300'
+                                activeCalc === tab.id ? 'bg-black/20 text-white' : 'bg-primary-300/40 text-primary-700'
                             }`}>
                                 {tab.badge}
                             </span>
@@ -431,10 +431,10 @@ export const ClinicalCalculatorsModal: React.FC<ClinicalCalculatorsModalProps> =
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-end shrink-0">
+                <div className="p-4 border-t border-primary-300/30 bg-primary-200/40 flex justify-end shrink-0">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2 text-xs font-bold text-slate-400 hover:text-white"
+                        className="px-5 py-2 text-xs font-bold text-primary-600 hover:text-primary-900 bg-primary-200/50 hover:bg-primary-300/60 rounded-xl border border-primary-300/30 transition-all"
                     >
                         Close Calculators
                     </button>

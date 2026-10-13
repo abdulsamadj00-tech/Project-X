@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState } from 'react';
 import { StethoscopeIcon, ChartBarIcon, UserCircleIcon, FolderOpenIcon, PlusCircleIcon, SparklesIcon, UsersIcon, ChartPieIcon, Bars3Icon, XMarkIcon } from './icons';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -8,6 +8,7 @@ interface HeaderProps {
     onOpenProfile: () => void;
     onNavigate: (view: 'records' | 'encounter' | 'clinicians' | 'dashboard') => void;
     onNewEncounter: () => void;
+    onAddRandomCase?: () => void;
     onOpenPricing: () => void;
     onLogout: () => void;
     onSwitchAccount: () => void;
@@ -17,7 +18,7 @@ interface HeaderProps {
     role?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNavigate, onNewEncounter, onOpenPricing, onLogout, onSwitchAccount, onOpenAudit, isSaving, isPro, role }) => {
+const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNavigate, onNewEncounter, onAddRandomCase, onOpenPricing, onLogout, onSwitchAccount, onOpenAudit, isSaving, isPro, role }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isAdmin = role === 'Owner' || role === 'Admin';
 
@@ -39,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                         </h1>
                         <div className="flex items-center gap-1.5 mt-1">
                             <div className="w-1.5 h-1.5 bg-brand-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(0,213,255,0.6)]"></div>
-                            <span className="text-[9px] font-black text-white0 uppercase tracking-widest">Clinical CDS</span>
+                            <span className="text-[9px] font-black text-primary-500 uppercase tracking-widest">Clinical CDS</span>
                         </div>
                     </div>
                 </div>
@@ -82,12 +83,23 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                         
                         <button
                             onClick={onNewEncounter}
-                            className="bg-brand-500 text-white font-black py-2.5 px-5 rounded-xl shadow-[0_0_20px_rgba(0,213,255,0.25)] hover:shadow-[0_0_30px_rgba(0,213,255,0.5)] hover:scale-[1.02] transition-all flex items-center gap-2 text-xs tracking-tight"
+                            className="bg-brand-500 text-white font-black py-2.5 px-4 sm:px-5 rounded-xl shadow-[0_0_20px_rgba(0,213,255,0.25)] hover:shadow-[0_0_30px_rgba(0,213,255,0.5)] hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 text-xs tracking-tight"
                             title="Create a New Patient Case"
                         >
                             <PlusCircleIcon className="h-4 w-4" />
                             <span className="hidden sm:inline">New Case</span>
                         </button>
+
+                        {onAddRandomCase && (
+                            <button
+                                onClick={onAddRandomCase}
+                                className="bg-primary-200/80 hover:bg-brand-500/10 hover:border-brand-500/40 text-primary-900 font-bold py-2.5 px-3 sm:px-4 rounded-xl border border-primary-300/40 transition-all flex items-center gap-1.5 text-xs shadow-sm hover:scale-[1.02] active:scale-95"
+                                title="Load a rich clinical sample case (Sepsis, Stroke STAT, DSM-5 Panic, Appendicitis)"
+                            >
+                                <span className="text-sm">🎲</span>
+                                <span className="hidden md:inline">Random Case</span>
+                            </button>
+                        )}
 
                         <div className="h-8 w-px bg-primary-400/30 mx-1 hidden md:block"></div>
 
@@ -103,7 +115,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                                 <span className="text-[9px] font-black text-primary-800 uppercase tracking-widest">
                                     Clinician
                                 </span>
-                                <span className="text-[9px] font-bold text-white0 uppercase tracking-widest mt-0.5">
+                                <span className="text-[9px] font-bold text-primary-500 uppercase tracking-widest mt-0.5">
                                     Verified
                                 </span>
                             </div>

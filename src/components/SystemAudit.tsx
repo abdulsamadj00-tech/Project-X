@@ -1,4 +1,4 @@
-﻿
+
 import React, { useMemo } from 'react';
 import { Encounter } from '../types';
 import { CheckCircleIcon, ExclamationCircleIcon, ShieldExclamationIcon, ChartBarIcon } from './icons';
@@ -105,7 +105,7 @@ const SystemAudit: React.FC<SystemAuditProps> = ({ encounters, onClose }) => {
           </div>
 
           <h3 className="text-[10px] md:text-sm font-black text-slate-900 mb-4 md:mb-6 flex items-center uppercase tracking-widest">
-            <ShieldExclamationIcon className="h-4 w-4 md:h-5 md:w-5 mr-2 md:mr-3 text-white0" />
+            <ShieldExclamationIcon className="h-4 w-4 md:h-5 md:w-5 mr-2 md:mr-3 text-brand-500" />
             Clinical Documentation Breakdown
           </h3>
 

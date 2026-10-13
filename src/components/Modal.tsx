@@ -1,4 +1,4 @@
-﻿
+
 import React from 'react';
 import { ClipboardIcon, XMarkIcon } from './icons';
 
@@ -22,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({ title, content, onClose }) => {
             <div className="bg-primary-100/90 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] w-full max-w-2xl max-h-[90vh] flex flex-col border border-primary-300/30">
                 <div className="flex justify-between items-center p-5 border-b border-primary-300/20">
                     <h2 className="text-xl font-bold text-white font-display">{title}</h2>
-                    <button onClick={onClose} className="text-white0 hover:text-white transition-colors p-2 rounded-lg hover:bg-primary-200/50">
+                    <button onClick={onClose} className="text-primary-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-primary-200/50">
                         <XMarkIcon className="h-6 w-6" />
                     </button>
                 </div>

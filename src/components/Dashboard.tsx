@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Encounter } from '../types';
 import { 
     BarChart3 as ChartBarIcon, 
@@ -25,9 +25,10 @@ import { motion } from 'framer-motion';
 interface DashboardProps {
     encounters: Encounter[];
     onSelectEncounter: (id: string) => void;
+    onAddRandomCase?: (presetIndex?: number) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncounter }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncounter, onAddRandomCase }) => {
     const totalCases = encounters.length;
     const activeCases = encounters.filter(e => e.status === 'Active').length;
     const completedCases = encounters.filter(e => e.status === 'Discharged').length;
@@ -74,10 +75,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                 )}
             </div>
             <div className="relative z-10">
-                <h3 className="text-white0 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] mb-1 md:mb-2 ml-1">{title}</h3>
+                <h3 className="text-primary-500 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] mb-1 md:mb-2 ml-1">{title}</h3>
                 <div className="flex items-baseline gap-2 md:gap-3">
                     <p className="text-3xl md:text-5xl font-bold text-white tracking-tighter font-display">{value}</p>
-                    {description && <span className="text-[9px] md:text-[10px] text-white0 font-bold uppercase tracking-widest">{description}</span>}
+                    {description && <span className="text-[9px] md:text-[10px] text-primary-500 font-bold uppercase tracking-widest">{description}</span>}
                 </div>
             </div>
         </motion.div>
@@ -92,6 +93,53 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                 <StatCard title="Shared Cases" value={sharedCases} icon={<UsersIcon />} gradientFrom="#ff57b0" gradientTo="#cc2c86" glowColor="#ff57b0" trend={24} description="collaboration" />
             </div>
 
+            {/* Quick Clinical Simulation Cases */}
+            <div className="bg-primary-100/70 backdrop-blur-xl p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-primary-300/40 shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl">🎲</span>
+                            <h3 className="text-lg md:text-xl font-bold text-primary-900 font-display">Instant Clinical Case Simulations</h3>
+                        </div>
+                        <p className="text-xs md:text-sm text-primary-500 font-medium mt-1">One-click realistic patient scenarios pre-populated with vitals, ESI triage, lab orders & stepwise pathways.</p>
+                    </div>
+                    {onAddRandomCase && (
+                        <button
+                            onClick={() => onAddRandomCase()}
+                            className="bg-brand-500 hover:bg-brand-400 text-white font-bold py-2.5 px-5 rounded-xl shadow-md hover:shadow-brand-500/30 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest shrink-0 active:scale-95"
+                        >
+                            <span>🎲</span>
+                            <span>Load Any Random Case</span>
+                        </button>
+                    )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[
+                        { title: 'Sepsis & CAP', patient: 'Eleanor Vance, 68F', badge: 'ESI Level 2', color: 'border-amber-500/40 bg-amber-500/5', desc: 'CURB-65 = 3, lobar pneumonia, lactate 2.8', idx: 0 },
+                        { title: 'Stroke STAT', patient: 'David Kowalski, 71M', badge: 'ESI Level 1', color: 'border-rose-500/40 bg-rose-500/5', desc: 'NIHSS 16, onset 45m, thrombolysis window', idx: 1 },
+                        { title: 'Panic & DSM-5', patient: 'Sarah Jenkins, 32F', badge: 'ESI Level 3', color: 'border-sky-500/40 bg-sky-500/5', desc: 'Acute panic episode vs ischemia, SSRI/CBT', idx: 2 },
+                        { title: 'Acute Abdomen', patient: 'Marcus Chen, 24M', badge: 'ESI Level 3', color: 'border-emerald-500/40 bg-emerald-500/5', desc: 'Appendicitis, McBurney sign, surgical prep', idx: 3 },
+                    ].map((c) => (
+                        <button
+                            key={c.idx}
+                            onClick={() => onAddRandomCase && onAddRandomCase(c.idx)}
+                            className={`p-4 rounded-2xl border text-left transition-all hover:scale-[1.02] active:scale-95 hover:border-brand-500/60 flex flex-col justify-between ${c.color}`}
+                        >
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary-400">{c.title}</span>
+                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary-200/60 text-primary-900 border border-primary-300/40">{c.badge}</span>
+                                </div>
+                                <h4 className="text-sm font-bold text-primary-900 mb-1">{c.patient}</h4>
+                                <p className="text-[11px] text-primary-500 line-clamp-2">{c.desc}</p>
+                            </div>
+                            <span className="text-[10px] font-bold text-brand-400 mt-3 flex items-center gap-1">Load Case ➔</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                 <div className="lg:col-span-2 bg-primary-100/60 backdrop-blur-xl p-6 md:p-10 rounded-2xl md:rounded-[3rem] border border-primary-300/30 shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:shadow-[0_12px_40px_rgba(0,213,255,0.1)] transition-all duration-500">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 md:mb-10 gap-4">
@@ -100,11 +148,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                                 <div className="w-1.5 h-6 md:h-8 bg-brand-500 rounded-full mr-3 md:mr-4 shadow-[0_0_12px_rgba(0,213,255,0.5)]"></div>
                                 Patient Flow Analysis
                             </h3>
-                            <p className="text-white0 text-xs md:text-sm mt-1 md:mt-2 font-medium">Daily case volume trends for the past week</p>
+                            <p className="text-primary-500 text-xs md:text-sm mt-1 md:mt-2 font-medium">Daily case volume trends for the past week</p>
                         </div>
                         <div className="flex gap-2 bg-primary-200/60 p-1 rounded-xl md:rounded-2xl border border-primary-300/30 w-fit">
                             <button className="px-4 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-primary-300/50 text-brand-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest shadow-sm transition-all border border-primary-400/20">7 Days</button>
-                            <button className="px-4 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl text-white0 text-[9px] md:text-[10px] font-bold uppercase tracking-widest hover:bg-primary-300/30 hover:text-primary-700 transition-all">30 Days</button>
+                            <button className="px-4 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl text-primary-500 text-[9px] md:text-[10px] font-bold uppercase tracking-widest hover:bg-primary-300/30 hover:text-primary-700 transition-all">30 Days</button>
                         </div>
                     </div>
                     <div className="h-80">
@@ -156,7 +204,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                 <div className="p-6 md:p-10 border-b border-primary-300/30 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-primary-200/30 gap-4">
                     <div>
                         <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight font-display">Recent Patient Activity</h3>
-                        <p className="text-white0 text-xs md:text-sm mt-1 md:mt-2 font-medium">Latest case updates and clinician interactions</p>
+                        <p className="text-primary-500 text-xs md:text-sm mt-1 md:mt-2 font-medium">Latest case updates and clinician interactions</p>
                     </div>
                     <button className="px-5 md:px-6 py-2.5 md:py-3 bg-primary-200/50 border border-primary-300/40 rounded-xl md:rounded-2xl text-[10px] font-bold uppercase tracking-widest text-primary-700 hover:bg-primary-300/50 hover:text-brand-400 hover:border-brand-500/30 transition-all">View All Records</button>
                 </div>
@@ -173,11 +221,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                                 </div>
                                 <div>
                                     <p className="font-bold text-white text-base md:text-xl group-hover:text-brand-400 transition-colors duration-500 font-display">{encounter.patientData.name}</p>
-                                    <p className="text-xs md:text-sm text-white0 font-medium mt-0.5 md:mt-1">{encounter.patientData.primaryComplaint}</p>
+                                    <p className="text-xs md:text-sm text-primary-500 font-medium mt-0.5 md:mt-1">{encounter.patientData.primaryComplaint}</p>
                                 </div>
                             </div>
                             <div className="text-right flex flex-col items-end gap-2 md:gap-3">
-                                <p className="text-[10px] font-bold text-white0 uppercase tracking-[0.3em]">
+                                <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.3em]">
                                     {new Date(encounter.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </p>
                                 <span className={`px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${
@@ -192,7 +240,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
                         <div className="p-12 md:p-20 text-center">
                             <ActivityIcon className="h-12 w-12 text-primary-400 mx-auto mb-4 animate-float" />
                             <p className="text-primary-600 font-bold text-lg">No patient activity yet</p>
-                            <p className="text-white0 text-sm mt-2">Create your first case to get started</p>
+                            <p className="text-primary-500 text-sm mt-2">Create your first case to get started</p>
                         </div>
                     )}
                 </div>

@@ -32,6 +32,8 @@ import { AmbientVoiceScribeModal } from './AmbientVoiceScribeModal';
 import { PatientEducationModal } from './PatientEducationModal';
 import { FHIRExportModal } from './FHIRExportModal';
 import { ClinicianAttestationModal } from './ClinicianAttestationModal';
+import { ClinicalReportStudioModal } from './ClinicalReportStudioModal';
+import { ReportType } from '../services/bilingualReportService';
 import { calculateNEWS2 } from '../services/clinicalCalculators';
 
 import { useCases } from '../CaseContext';
@@ -76,6 +78,8 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
     const [isEducationOpen, setIsEducationOpen] = useState<boolean>(false);
     const [isFHIROpen, setIsFHIROpen] = useState<boolean>(false);
     const [isAttestationOpen, setIsAttestationOpen] = useState<boolean>(false);
+    const [isReportStudioOpen, setIsReportStudioOpen] = useState<boolean>(false);
+    const [studioReportType, setStudioReportType] = useState<ReportType>('comprehensive');
 
     const currentNEWS2 = calculateNEWS2(encounter.patientData.vitals || { temp: '', hr: '', rr: '', bp: '', spo2: '' });
 
@@ -272,36 +276,36 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
             </div>
 
             {/* Minimalist Clinical Quick Tools Bar */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6 p-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6 p-3 rounded-2xl bg-primary-100/90 backdrop-blur-xl border border-primary-300/40 shadow-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Quick Tools:</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary-400 px-1">Quick Tools:</span>
                     <button
                         onClick={() => setIsVoiceScribeOpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-200/60 hover:bg-brand-500/15 hover:text-brand-400 text-primary-800 hover:border-brand-500/40 border border-primary-300/40 text-xs font-bold transition-all active:scale-95 shadow-xs"
                     >
                         <span>🎙️</span>
                         <span>Ambient Scribe</span>
                     </button>
                     <button
                         onClick={() => setIsCalculatorsOpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-200/60 hover:bg-brand-500/15 hover:text-brand-400 text-primary-800 hover:border-brand-500/40 border border-primary-300/40 text-xs font-bold transition-all active:scale-95 shadow-xs"
                     >
                         <span>🧮</span>
                         <span>Risk Calculators</span>
                     </button>
                     <button
                         onClick={() => setIsEducationOpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-200/60 hover:bg-brand-500/15 hover:text-brand-400 text-primary-800 hover:border-brand-500/40 border border-primary-300/40 text-xs font-bold transition-all active:scale-95 shadow-xs"
                     >
                         <span>📖</span>
                         <span>Patient Aftercare</span>
                     </button>
                     <button
                         onClick={() => setIsAttestationOpen(true)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 border ${
+                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 border ${
                             encounter.attestation
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                                : 'bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border-slate-200'
+                                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/25'
+                                : 'bg-primary-200/60 hover:bg-brand-500/15 hover:text-brand-400 text-primary-800 hover:border-brand-500/40 border border-primary-300/40'
                         }`}
                     >
                         <span>{encounter.attestation ? '✅' : '✍️'}</span>
@@ -309,10 +313,30 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
                     </button>
                     <button
                         onClick={() => setIsFHIROpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-200/60 hover:bg-brand-500/15 hover:text-brand-400 text-primary-800 hover:border-brand-500/40 border border-primary-300/40 text-xs font-bold transition-all active:scale-95 shadow-xs"
                     >
                         <span>🌐</span>
                         <span>HL7 FHIR R4</span>
+                    </button>
+                    <button
+                        onClick={() => {
+                            setStudioReportType('comprehensive');
+                            setIsReportStudioOpen(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/40 text-xs font-black transition-all active:scale-95 shadow-xs"
+                    >
+                        <span>📄</span>
+                        <span>Bilingual PDF Studio</span>
+                    </button>
+                    <button
+                        onClick={() => {
+                            setStudioReportType('lama');
+                            setIsReportStudioOpen(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40 text-xs font-black transition-all active:scale-95 shadow-xs"
+                    >
+                        <span>⚠️</span>
+                        <span>LAMA (اردو / EN)</span>
                     </button>
                 </div>
                 <div className="shrink-0">
@@ -380,6 +404,16 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
                     encounter={encounter}
                     onUpdateEncounter={(updated) => setEncounter(updated)}
                     onClose={() => setIsAttestationOpen(false)}
+                />
+            )}
+
+            {isReportStudioOpen && (
+                <ClinicalReportStudioModal
+                    encounter={encounter}
+                    initialReportType={studioReportType}
+                    doctorDetails={profile || { name: 'Attending Clinician, MD', role: 'Clinician', licenseNumber: 'MD-92841-EM' }}
+                    onClose={() => setIsReportStudioOpen(false)}
+                    onUpdateEncounter={(updated) => setEncounter(updated)}
                 />
             )}
         </div>
@@ -1605,10 +1639,7 @@ interface ReportsTabProps {
     onNext: () => void;
 }
 const ReportsTab: React.FC<ReportsTabProps> = ({ encounter, setEncounter, doctorDetails, onNext }) => {
-    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [isDischargeModalOpen, setIsDischargeModalOpen] = useState(false);
-    const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
-    const [isLamaModalOpen, setIsLamaModalOpen] = useState(false);
+    const [studioReportType, setStudioReportType] = useState<ReportType | null>(null);
     const [isAnalyzingReport, setIsAnalyzingReport] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1699,41 +1730,62 @@ const ReportsTab: React.FC<ReportsTabProps> = ({ encounter, setEncounter, doctor
                 </div>
             </ModuleCard>
 
-            <ModuleCard title="Generate & Download Reports" icon={<DocumentTextIcon className="h-6 w-6"/>} initialOpen>
-                <p className="text-slate-500 mb-10 text-sm font-medium leading-relaxed max-w-2xl">Generate standardized medical documents for this encounter. All documents are editable before final PDF generation.</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <button onClick={() => setIsReportModalOpen(true)} className="group flex flex-col items-center justify-center p-10 bg-brand-50 text-brand-800 rounded-[3rem] border border-brand-100 hover:bg-brand-100 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
-                        <div className="p-5 bg-primary-100 rounded-2xl shadow-sm mb-6 group-hover:scale-110 transition-transform group-hover:rotate-3">
-                            <DocumentTextIcon className="h-10 w-10 text-brand-600"/>
+            <ModuleCard title="Generate & Download Reports (English & اردو)" icon={<DocumentTextIcon className="h-6 w-6"/>} initialOpen>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <p className="text-primary-600 text-sm font-medium leading-relaxed max-w-2xl">
+                        AI-assisted clinical documentation generator with live PDF preview, customizable section selection, and official bilingual English & Urdu (اردو) output.
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-black shrink-0">
+                        <span>🇵🇰 🇬🇧</span>
+                        <span>Bilingual EN / اردو</span>
+                    </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <button onClick={() => setStudioReportType('comprehensive')} className="group flex flex-col items-center justify-center p-8 bg-primary-200/50 hover:bg-cyan-500/10 text-primary-900 rounded-3xl border border-primary-300/40 hover:border-cyan-500/50 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
+                        <div className="p-4 bg-primary-100 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform group-hover:rotate-3 border border-primary-300/30">
+                            <DocumentTextIcon className="h-8 w-8 text-cyan-600 dark:text-cyan-400"/>
                         </div>
-                        <span className="font-black uppercase tracking-[0.2em] text-[10px]">Comprehensive Report</span>
+                        <span className="font-black uppercase tracking-wider text-xs">Comprehensive Report</span>
+                        <span className="text-xs font-urdu text-primary-600 font-bold mt-1" dir="rtl">جامع کلینیکل رپورٹ</span>
+                        <span className="text-[10px] text-primary-500 mt-2 font-mono">Live Preview • PDF</span>
                     </button>
-                    <button onClick={() => setIsReferralModalOpen(true)} className="group flex flex-col items-center justify-center p-10 bg-indigo-50 text-indigo-800 rounded-[3rem] border border-indigo-100 hover:bg-indigo-100 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
-                        <div className="p-5 bg-primary-100 rounded-2xl shadow-sm mb-6 group-hover:scale-110 transition-transform group-hover:-rotate-3">
-                            <ArrowUpOnSquareIcon className="h-10 w-10 text-indigo-600"/>
+                    <button onClick={() => setStudioReportType('referral')} className="group flex flex-col items-center justify-center p-8 bg-primary-200/50 hover:bg-indigo-500/10 text-primary-900 rounded-3xl border border-primary-300/40 hover:border-indigo-500/50 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
+                        <div className="p-4 bg-primary-100 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform group-hover:-rotate-3 border border-primary-300/30">
+                            <ArrowUpOnSquareIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400"/>
                         </div>
-                        <span className="font-black uppercase tracking-[0.2em] text-[10px]">Referral Letter</span>
+                        <span className="font-black uppercase tracking-wider text-xs">Referral Letter</span>
+                        <span className="text-xs font-urdu text-primary-600 font-bold mt-1" dir="rtl">ریفرل خط و سفارش</span>
+                        <span className="text-[10px] text-primary-500 mt-2 font-mono">Specialist Handover</span>
                     </button>
-                    <button onClick={() => setIsDischargeModalOpen(true)} className="group flex flex-col items-center justify-center p-10 bg-emerald-50 text-emerald-800 rounded-[3rem] border border-emerald-100 hover:bg-emerald-100 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
-                        <div className="p-5 bg-primary-100 rounded-2xl shadow-sm mb-6 group-hover:scale-110 transition-transform group-hover:rotate-3">
-                            <ClipboardDocumentListIcon className="h-10 w-10 text-emerald-600"/>
+                    <button onClick={() => setStudioReportType('discharge')} className="group flex flex-col items-center justify-center p-8 bg-primary-200/50 hover:bg-emerald-500/10 text-primary-900 rounded-3xl border border-primary-300/40 hover:border-emerald-500/50 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
+                        <div className="p-4 bg-primary-100 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform group-hover:rotate-3 border border-primary-300/30">
+                            <ClipboardDocumentListIcon className="h-8 w-8 text-emerald-600 dark:text-emerald-400"/>
                         </div>
-                        <span className="font-black uppercase tracking-[0.2em] text-[10px]">Discharge Summary</span>
+                        <span className="font-black uppercase tracking-wider text-xs">Discharge Summary</span>
+                        <span className="text-xs font-urdu text-primary-600 font-bold mt-1" dir="rtl">ڈسچارج سمری رپورٹ</span>
+                        <span className="text-[10px] text-primary-500 mt-2 font-mono">Hospital Course & Meds</span>
                     </button>
-                    <button onClick={() => setIsLamaModalOpen(true)} className="group flex flex-col items-center justify-center p-10 bg-rose-50 text-rose-800 rounded-[3rem] border border-rose-100 hover:bg-rose-100 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
-                        <div className="p-5 bg-primary-100 rounded-2xl shadow-sm mb-6 group-hover:scale-110 transition-transform group-hover:-rotate-3">
-                            <ExclamationCircleIcon className="h-10 w-10 text-rose-600"/>
+                    <button onClick={() => setStudioReportType('lama')} className="group flex flex-col items-center justify-center p-8 bg-primary-200/50 hover:bg-rose-500/10 text-primary-900 rounded-3xl border border-primary-300/40 hover:border-rose-500/50 transition-all active:scale-95 shadow-sm hover:shadow-xl hover:-translate-y-1">
+                        <div className="p-4 bg-primary-100 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform group-hover:-rotate-3 border border-primary-300/30">
+                            <ExclamationCircleIcon className="h-8 w-8 text-rose-600 dark:text-rose-400"/>
                         </div>
-                        <span className="font-black uppercase tracking-[0.2em] text-[10px]">LAMA Form</span>
+                        <span className="font-black uppercase tracking-wider text-xs">LAMA Form</span>
+                        <span className="text-xs font-urdu text-primary-600 font-bold mt-1" dir="rtl">میڈیکل ایڈوائس کے خلاف رخصتی</span>
+                        <span className="text-[10px] text-primary-500 mt-2 font-mono">Legal Refusal • اردو / EN</span>
                     </button>
                 </div>
             </ModuleCard>
 
-            {/* Modals */}
-            {isReportModalOpen && <GenerateReportModal onClose={() => setIsReportModalOpen(false)} onGenerate={handleGenerateComprehensiveReport} patientData={encounter.patientData} diagnoses={encounter.provisionalDiagnoses} initialDoctorDetails={doctorDetails} />}
-            {isDischargeModalOpen && <DischargeSummaryModal onClose={() => setIsDischargeModalOpen(false)} patientData={encounter.patientData} finalDiagnosis={encounter.finalDiagnosis} doctorDetails={doctorDetails} />}
-            {isReferralModalOpen && <ReferralLetterModal onClose={() => setIsReferralModalOpen(false)} patientData={encounter.patientData} diagnoses={encounter.provisionalDiagnoses} doctorDetails={doctorDetails} />}
-            {isLamaModalOpen && <LamaModal onClose={() => setIsLamaModalOpen(false)} patientData={encounter.patientData} doctorDetails={doctorDetails} />}
+            {/* Bilingual PDF Studio Modal */}
+            {studioReportType && (
+                <ClinicalReportStudioModal
+                    encounter={encounter}
+                    initialReportType={studioReportType}
+                    doctorDetails={doctorDetails}
+                    onClose={() => setStudioReportType(null)}
+                    onUpdateEncounter={(updated) => setEncounter(updated)}
+                />
+            )}
             <NextStepButton onClick={onNext} label="Next: Sharing" />
         </div>
     );

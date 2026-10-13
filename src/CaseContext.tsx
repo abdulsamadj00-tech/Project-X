@@ -15,12 +15,14 @@ import {
 } from './firebase';
 import { Encounter, SharedCase } from './types';
 import { useAuth } from './AuthContext';
+import { RANDOM_SAMPLE_CASES, getRandomSampleCase } from './data/sampleCases';
 
 interface CaseContextType {
     encounters: Encounter[];
     sharedCases: SharedCase[];
     loading: boolean;
     createEncounter: (data: Partial<Encounter>) => Promise<string>;
+    addRandomCase: (presetIndex?: number) => Promise<string>;
     updateEncounter: (id: string, data: Partial<Encounter>) => Promise<void>;
     deleteEncounter: (id: string) => Promise<void>;
     shareCase: (encounterId: string, doctorEmail: string, message?: string) => Promise<void>;
@@ -659,8 +661,18 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
+    const addRandomCase = async (presetIndex?: number): Promise<string> => {
+        let caseTemplate: Omit<Encounter, 'id' | 'timestamp'>;
+        if (presetIndex !== undefined && RANDOM_SAMPLE_CASES[presetIndex]) {
+            caseTemplate = JSON.parse(JSON.stringify(RANDOM_SAMPLE_CASES[presetIndex]));
+        } else {
+            caseTemplate = getRandomSampleCase();
+        }
+        return await createEncounter(caseTemplate);
+    };
+
     return (
-        <CaseContext.Provider value={{ encounters, sharedCases, loading, createEncounter, updateEncounter, deleteEncounter, shareCase }}>
+        <CaseContext.Provider value={{ encounters, sharedCases, loading, createEncounter, addRandomCase, updateEncounter, deleteEncounter, shareCase }}>
             {children}
         </CaseContext.Provider>
     );

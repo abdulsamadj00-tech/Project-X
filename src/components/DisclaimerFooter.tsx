@@ -1,4 +1,4 @@
-﻿
+
 import React from 'react';
 import { ShieldExclamationIcon } from './icons';
 
@@ -10,7 +10,7 @@ const DisclaimerFooter: React.FC = () => {
                     <ShieldExclamationIcon className="h-6 w-6 mr-2 text-amber-500" />
                     <h3 className="font-semibold text-primary-800">Important Disclaimer</h3>
                 </div>
-                <p className="text-sm text-white0 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-sm text-primary-500 max-w-3xl mx-auto leading-relaxed">
                     This tool is for educational and clinical support use only. It is not a substitute for professional medical judgment. 
                     Always consult a qualified physician for diagnosis and treatment. All data is anonymized and private.
                 </p>

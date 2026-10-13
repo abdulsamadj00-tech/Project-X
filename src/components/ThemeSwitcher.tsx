@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme, THEMES, ThemeName } from '../ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,7 +39,7 @@ const ThemeSwitcher: React.FC = () => {
                         transition={{ duration: 0.2, ease: 'easeOut' }}
                         className="absolute right-0 top-14 w-72 bg-primary-100/95 backdrop-blur-2xl rounded-2xl border border-primary-300/40 shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-3 z-[100]"
                     >
-                        <p className="text-[9px] font-black text-white0 uppercase tracking-[0.3em] px-3 pt-2 pb-3">
+                        <p className="text-[9px] font-black text-primary-500 uppercase tracking-[0.3em] px-3 pt-2 pb-3">
                             Select Theme
                         </p>
                         <div className="space-y-1.5">
@@ -75,7 +75,7 @@ const ThemeSwitcher: React.FC = () => {
                                         }`}>
                                             {t.label}
                                         </p>
-                                        <p className="text-[10px] text-white0 truncate">
+                                        <p className="text-[10px] text-primary-500 truncate">
                                             {t.description}
                                         </p>
                                     </div>

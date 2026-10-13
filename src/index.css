@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ============================================================
@@ -453,5 +453,38 @@
     linear-gradient(rgba(245,158,11,0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(245,158,11,0.02) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Urdu Typography & RTL Helper */
+.font-urdu {
+  font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', system-ui, sans-serif;
+  line-height: 1.9;
+  letter-spacing: 0;
+}
+
+/* Print Styles for Clinical PDF / Printout */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #clinical-report-printable,
+  #clinical-report-printable * {
+    visibility: visible !important;
+  }
+  #clinical-report-printable {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
 

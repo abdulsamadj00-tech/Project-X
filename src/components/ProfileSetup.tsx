@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { DoctorRole } from '../types';
 import { motion } from 'framer-motion';
@@ -49,8 +49,8 @@ export const ProfileSetup: React.FC = () => {
         }
     };
 
-    const inputClasses = "w-full bg-primary-200/50 border border-primary-300/50 rounded-xl md:rounded-2xl py-3 md:py-3.5 pl-10 md:pl-12 pr-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all font-bold text-white text-sm md:text-base placeholder:text-white0 backdrop-blur-md";
-    const iconClasses = "absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-white0";
+    const inputClasses = "w-full bg-primary-200/50 border border-primary-300/50 rounded-xl md:rounded-2xl py-3 md:py-3.5 pl-10 md:pl-12 pr-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all font-bold text-white text-sm md:text-base placeholder:text-primary-500 backdrop-blur-md";
+    const iconClasses = "absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-primary-400";
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-50/90 backdrop-blur-xl p-4">
@@ -69,7 +69,7 @@ export const ProfileSetup: React.FC = () => {
                     <div className="grid grid-cols-1 gap-5 md:gap-6">
                         {/* Name */}
                         <div className="space-y-1.5 md:space-y-2">
-                            <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">Full Name *</label>
+                            <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">Full Name *</label>
                             <div className="relative">
                                 <User className={iconClasses} />
                                 <input 
@@ -85,7 +85,7 @@ export const ProfileSetup: React.FC = () => {
 
                         {/* Role Selection */}
                         <div className="space-y-1.5 md:space-y-2">
-                            <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">Your Role *</label>
+                            <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">Your Role *</label>
                             <div className="relative">
                                 <Briefcase className={iconClasses} />
                                 <select 
@@ -103,7 +103,7 @@ export const ProfileSetup: React.FC = () => {
 
                         {/* Position / Year of Study */}
                         <div className="space-y-1.5 md:space-y-2">
-                            <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">Position / Year of Study *</label>
+                            <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">Position / Year of Study *</label>
                             <div className="relative">
                                 <GraduationCap className={iconClasses} />
                                 <input 
@@ -119,7 +119,7 @@ export const ProfileSetup: React.FC = () => {
 
                         {/* Hospital / Medical College */}
                         <div className="space-y-1.5 md:space-y-2">
-                            <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">Hospital / Medical College *</label>
+                            <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">Hospital / Medical College *</label>
                             <div className="relative">
                                 <Building2 className={iconClasses} />
                                 <input 
@@ -136,18 +136,18 @@ export const ProfileSetup: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                             {/* Specialty */}
                             <div className="space-y-1.5 md:space-y-2">
-                                <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">Specialty</label>
+                                <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">Specialty</label>
                                 <input 
                                     type="text" 
                                     value={specialty}
                                     onChange={(e) => setSpecialty(e.target.value)}
-                                    className="w-full bg-primary-200/50 border border-primary-300/50 rounded-xl md:rounded-2xl py-3 md:py-3.5 px-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all font-bold text-white text-sm md:text-base placeholder:text-white0 backdrop-blur-md"
+                                    className="w-full bg-primary-200/50 border border-primary-300/50 rounded-xl md:rounded-2xl py-3 md:py-3.5 px-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all font-bold text-white text-sm md:text-base placeholder:text-primary-500 backdrop-blur-md"
                                     placeholder="e.g. Cardiology"
                                 />
                             </div>
                             {/* License Number */}
                             <div className="space-y-1.5 md:space-y-2">
-                                <label className="text-[10px] md:text-xs font-black text-white0 uppercase tracking-widest ml-1">License No.</label>
+                                <label className="text-[10px] md:text-xs font-black text-primary-400 uppercase tracking-widest ml-1">License No.</label>
                                 <div className="relative">
                                     <Award className={iconClasses} />
                                     <input 

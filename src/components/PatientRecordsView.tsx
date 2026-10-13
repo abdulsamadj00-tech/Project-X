@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState, useMemo } from 'react';
 import { Encounter } from '../types';
 import { MagnifyingGlassIcon, TagIcon, TrashIcon } from './icons';
@@ -8,9 +8,10 @@ interface PatientRecordsViewProps {
     encounters: Encounter[];
     onSelectEncounter: (id: string) => void;
     onDeleteEncounter: (id: string) => void;
+    onAddRandomCase?: () => void;
 }
 
-const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onSelectEncounter, onDeleteEncounter }) => {
+const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onSelectEncounter, onDeleteEncounter, onAddRandomCase }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | Encounter['status']>('all');
     const [dateFilter, setDateFilter] = useState('all');
@@ -59,21 +60,32 @@ const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onS
     
     return (
         <div className="max-w-6xl mx-auto space-y-12 animate-slide-up">
-            <div className="text-center px-4">
-                <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter mb-3 md:mb-4 font-display">Patient Case Records</h2>
-                <p className="text-primary-600 font-medium text-base md:text-lg max-w-2xl mx-auto">Search, filter, and manage all patient encounters with precision and ease.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
+                <div className="text-left">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter mb-2 font-display">Patient Case Records</h2>
+                    <p className="text-primary-600 font-medium text-sm md:text-base">Search, filter, and manage all patient encounters with precision and ease.</p>
+                </div>
+                {onAddRandomCase && (
+                    <button
+                        onClick={onAddRandomCase}
+                        className="bg-brand-500 hover:bg-brand-400 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-brand-500/30 transition-all flex items-center gap-2 text-xs uppercase tracking-widest shrink-0 active:scale-95"
+                    >
+                        <span>🎲</span>
+                        <span>Add Random Case</span>
+                    </button>
+                )}
             </div>
             
             <div className="bg-primary-100/60 backdrop-blur-2xl p-6 md:p-8 rounded-2xl md:rounded-[3rem] border border-primary-300/30 shadow-[0_8px_30px_rgb(0,0,0,0.3)] sticky top-[70px] md:top-[81px] z-10 mx-4 md:mx-0">
                 <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6 items-center">
                     <div className="relative md:col-span-3">
-                        <MagnifyingGlassIcon className="h-5 w-5 md:h-6 md:w-6 text-white0 absolute top-1/2 left-4 md:left-5 -translate-y-1/2" />
+                        <MagnifyingGlassIcon className="h-5 w-5 md:h-6 md:w-6 text-primary-400 absolute top-1/2 left-4 md:left-5 -translate-y-1/2" />
                         <input
                             type="text"
                             placeholder="Search name, diagnosis, tag, ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-primary-200/60 border border-primary-300/30 rounded-xl md:rounded-2xl py-3.5 md:py-4 pl-12 md:pl-14 pr-4 md:pr-6 text-white placeholder:text-white0 focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50 transition-all font-medium text-sm md:text-base backdrop-blur-md outline-none"
+                            className="w-full bg-primary-200/60 border border-primary-300/30 rounded-xl md:rounded-2xl py-3.5 md:py-4 pl-12 md:pl-14 pr-4 md:pr-6 text-white placeholder:text-primary-500 focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50 transition-all font-medium text-sm md:text-base backdrop-blur-md outline-none"
                         />
                     </div>
                      <div className="md:col-span-1">
@@ -104,7 +116,7 @@ const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onS
                 </div>
                 {allTags.length > 0 && (
                     <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-primary-300/20">
-                         <h4 className="text-[9px] md:text-[10px] font-bold text-white0 uppercase tracking-[0.3em] mb-3 md:mb-4 ml-1">Filter by Tags</h4>
+                         <h4 className="text-[9px] md:text-[10px] font-bold text-primary-400 uppercase tracking-[0.3em] mb-3 md:mb-4 ml-1">Filter by Tags</h4>
                          <div className="flex flex-wrap gap-2 md:gap-3">
                             {allTags.map(tag => (
                                 <button
@@ -150,17 +162,17 @@ const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onS
                                                 {encounter.status}
                                             </span>
                                         </div>
-                                        <p className="text-[9px] md:text-[10px] text-white0 font-bold uppercase tracking-[0.2em] truncate">
+                                        <p className="text-[9px] md:text-[10px] text-primary-400 font-bold uppercase tracking-[0.2em] truncate">
                                             {new Date(encounter.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} | ID: {encounter.id.slice(0, 8)}
                                         </p>
                                         <div className="mt-3 md:mt-4 flex flex-wrap items-center gap-2 md:gap-3">
                                             <div className="px-3 md:px-4 py-1.5 md:py-2 bg-primary-200/50 rounded-lg md:rounded-xl border border-primary-300/30">
-                                                <span className="text-white0 font-bold uppercase text-[8px] md:text-[9px] tracking-widest mr-2">Diagnosis</span> 
+                                                <span className="text-primary-400 font-bold uppercase text-[8px] md:text-[9px] tracking-widest mr-2">Diagnosis</span> 
                                                 <span className="text-xs md:text-sm text-primary-800 font-bold">{encounter.finalDiagnosis?.diagnosisName || encounter.provisionalDiagnoses[0]?.diagnosisName || 'Pending Evaluation'}</span>
                                             </div>
                                             {encounter.tags?.map(tag => (
                                                 <span key={tag} className="flex items-center bg-primary-200/50 text-primary-600 px-2.5 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-lg md:rounded-xl border border-primary-300/30">
-                                                    <TagIcon className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 md:mr-1.5 text-white0" /> {tag}
+                                                    <TagIcon className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1 md:mr-1.5 text-primary-400" /> {tag}
                                                 </span>
                                             ))}
                                         </div>
@@ -175,7 +187,7 @@ const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onS
                                     </button>
                                     <button
                                         onClick={() => onDeleteEncounter(encounter.id)}
-                                        className="p-3.5 md:p-4 text-white0 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl md:rounded-2xl transition-all duration-300 border border-transparent hover:border-rose-500/20"
+                                        className="p-3.5 md:p-4 text-primary-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl md:rounded-2xl transition-all duration-300 border border-transparent hover:border-rose-500/20"
                                         title="Delete Case"
                                     >
                                         <TrashIcon className="h-5 w-5 md:h-6 md:w-6" />
@@ -190,7 +202,7 @@ const PatientRecordsView: React.FC<PatientRecordsViewProps> = ({ encounters, onS
                             className="text-center py-20 md:py-32 bg-primary-100/60 backdrop-blur-xl rounded-2xl md:rounded-[3rem] border border-primary-300/30 shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
                         >
                             <div className="h-20 w-20 md:h-24 md:w-24 bg-primary-200/50 rounded-2xl md:rounded-[2rem] flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-inner border border-primary-300/30">
-                                <MagnifyingGlassIcon className="h-8 w-8 md:h-10 md:w-10 text-white0" />
+                                <MagnifyingGlassIcon className="h-8 w-8 md:h-10 md:w-10 text-primary-400" />
                             </div>
                             <p className="text-primary-700 font-bold text-lg md:text-xl px-4">{encounters.length === 0 ? "No patient cases have been created yet." : "No encounters match your search criteria."}</p>
                             {encounters.length > 0 && (

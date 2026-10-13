@@ -52,73 +52,73 @@ export const ClinicianAttestationModal: React.FC<ClinicianAttestationModalProps>
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in">
+            <div className="bg-primary-100 border border-primary-300/40 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl text-primary-900">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
                                 Medico-Legal Audit & Verification
                             </span>
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-black text-white font-display tracking-tight mt-0.5">
+                        <h2 className="text-xl sm:text-2xl font-black text-primary-900 font-display tracking-tight mt-0.5">
                             Clinician Verification & Attestation
                         </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-9 h-9 rounded-xl bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+                        className="w-9 h-9 rounded-xl bg-primary-200/60 text-primary-400 hover:text-primary-900 hover:bg-primary-300/60 border border-primary-300/30 flex items-center justify-center transition-all"
                     >
                         ✕
                     </button>
                 </div>
 
                 {/* Case Summary Pill */}
-                <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-1">
+                <div className="p-4 rounded-xl bg-primary-200/50 border border-primary-300/30 text-xs text-primary-800 space-y-1">
                     <div><strong>Patient:</strong> {encounter.patientData.name || 'Patient'} ({encounter.patientData.age}yo)</div>
                     <div><strong>Primary Working Diagnosis:</strong> {encounter.finalDiagnosis?.diagnosisName || encounter.provisionalDiagnoses?.[0]?.diagnosisName || 'Under Investigation'}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">Case ID: {encounter.id}</div>
+                    <div className="text-[11px] text-primary-500 font-mono">Case ID: {encounter.id}</div>
                 </div>
 
                 <form onSubmit={handleSignAndAttest} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Clinician Name</label>
+                            <label className="block text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Clinician Name</label>
                             <input
                                 type="text"
                                 required
                                 value={clinicianName}
                                 onChange={(e) => setClinicianName(e.target.value)}
-                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-xs font-semibold"
+                                className="w-full bg-primary-200/50 border border-primary-300/40 focus:border-cyan-500 focus:outline-none rounded-xl p-3 text-primary-900 text-xs font-semibold"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Medical License / GMC / NPI</label>
+                            <label className="block text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Medical License / GMC / NPI</label>
                             <input
                                 type="text"
                                 required
                                 value={licenseNumber}
                                 onChange={(e) => setLicenseNumber(e.target.value)}
-                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-xs font-mono"
+                                className="w-full bg-primary-200/50 border border-primary-300/40 focus:border-cyan-500 focus:outline-none rounded-xl p-3 text-primary-900 text-xs font-mono"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Clinical Attestation Notes (Optional)</label>
+                        <label className="block text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">Clinical Attestation Notes (Optional)</label>
                         <textarea
                             rows={2}
                             value={attestationNotes}
                             onChange={(e) => setAttestationNotes(e.target.value)}
                             placeholder="e.g. Discussed treatment risks and benefits with patient and family..."
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-xs"
+                            className="w-full bg-primary-200/50 border border-primary-300/40 focus:border-cyan-500 focus:outline-none rounded-xl p-3 text-primary-900 text-xs"
                         />
                     </div>
 
                     {/* Attestation Checkbox */}
-                    <div className="p-4 rounded-xl bg-slate-950/90 border border-cyan-500/40 space-y-2">
+                    <div className="p-4 rounded-xl bg-primary-200/40 border border-cyan-500/40 space-y-2">
                         <label className="flex items-start gap-3 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -127,18 +127,18 @@ export const ClinicianAttestationModal: React.FC<ClinicianAttestationModalProps>
                                 onChange={(e) => setHasAgreed(e.target.checked)}
                                 className="w-4 h-4 mt-0.5 accent-cyan-400 rounded cursor-pointer shrink-0"
                             />
-                            <span className="text-xs text-slate-300 leading-relaxed font-medium">
+                            <span className="text-xs text-primary-800 leading-relaxed font-medium">
                                 I hereby attest that I have reviewed the AI-assisted differential diagnoses, ICD-11 coding, and treatment suggestions. I confirm that all active orders and clinical management plans are consistent with independent clinical judgment and authentic practice guidelines.
                             </span>
                         </label>
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <div className="flex justify-end items-center gap-3 pt-4 border-t border-primary-300/30">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white"
+                            className="px-4 py-2 text-xs font-bold text-primary-500 hover:text-primary-900 transition-colors"
                         >
                             Cancel
                         </button>
