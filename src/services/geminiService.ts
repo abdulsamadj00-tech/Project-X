@@ -2309,3 +2309,64 @@ export const consultNextRecommendationsAI = async (
     };
 };
 
+// ==========================================
+// FEATURE: AMBIENT AI VOICE SCRIBE PARSER
+// ==========================================
+
+export const parseAmbientVoiceTranscript = async (transcript: string): Promise<Partial<PatientData>> => {
+    const prompt = `
+        You are "MediDx Ambient Clinical Scribe". Parse this spoken physician dictation / clinical interaction into a structured patient record:
+        Dictation: "${transcript}"
+
+        Extract and return ONLY a JSON object:
+        {
+          "name": "string (or empty)",
+          "age": "string number (or empty)",
+          "sex": "Male" | "Female" | "Other",
+          "primaryComplaint": "Concise chief complaint string",
+          "hopi": "Structured History of Present Illness paragraph",
+          "findings": "Physical examination findings paragraph",
+          "vitals": {
+            "temp": "number string (or empty)",
+            "hr": "number string (or empty)",
+            "rr": "number string (or empty)",
+            "bp": "e.g. 140/90 (or empty)",
+            "spo2": "number string (or empty)"
+          },
+          "pmh": "Past medical history string",
+          "allergies": "Allergies profile string"
+        }
+    `;
+
+    try {
+        const jsonText = await callAI(prompt);
+        const parsed = parseJsonSafely<Partial<PatientData>>(jsonText);
+        if (parsed && (parsed.primaryComplaint || parsed.hopi)) {
+            return parsed;
+        }
+    } catch (e) {
+        console.warn("Ambient scribe AI notice, using clinical rule extraction:", e);
+    }
+
+    // High-yield regex extraction fallback
+    const bpMatch = transcript.match(/blood pressure (?:is )?(\d{2,3}[\s/over]+\d{2,3})/i);
+    const hrMatch = transcript.match(/(?:heart rate|pulse)(?: is)? (\d{2,3})/i);
+    const spo2Match = transcript.match(/(?:saturation|spo2|o2 sat)(?: is)? (\d{2,3})/i);
+    const tempMatch = transcript.match(/(?:temperature|temp)(?: is)? (\d{2}(?:\.\d)?)/i);
+    const ageMatch = transcript.match(/(\d{1,3})\s*(?:year|yo|yr)/i);
+
+    return {
+        primaryComplaint: transcript.slice(0, 150),
+        hopi: transcript,
+        age: ageMatch ? ageMatch[1] : undefined,
+        vitals: {
+            bp: bpMatch ? bpMatch[1].replace(/over/i, '/').replace(/\s+/g, '') : '',
+            hr: hrMatch ? hrMatch[1] : '',
+            spo2: spo2Match ? spo2Match[1] : '',
+            temp: tempMatch ? tempMatch[1] : '',
+            rr: ''
+        }
+    };
+};
+
+

@@ -164,6 +164,79 @@ export interface MedicalReport {
     fileName: string;
 }
 
+export interface ClinicalRiskScore {
+    id: string;
+    name: string; // e.g., 'Wells Score for PE', 'CURB-65', 'TIMI Risk Score (NSTEMI)', 'CHA2DS2-VASc'
+    score: number;
+    maxScore: number;
+    riskCategory: 'Low Risk' | 'Intermediate / Moderate Risk' | 'High Risk' | 'Very High Risk';
+    interpretation: string;
+    clinicalRecommendation: string;
+    criteriaChecked: { label: string; points: number }[];
+    calculatedAt: number;
+}
+
+export interface DDIAlert {
+    id: string;
+    severity: 'Contraindicated' | 'Major Warning' | 'Moderate' | 'Minor';
+    interactingDrugs: [string, string];
+    mechanism: string;
+    clinicalImpact: string;
+    recommendation: string;
+    evidenceClass: string;
+}
+
+export interface AllergyAlert {
+    id: string;
+    drugName: string;
+    matchedAllergy: string;
+    reactionRisk: string;
+    crossReactivityRisk?: string;
+    recommendation: string;
+}
+
+export interface NEWS2Assessment {
+    totalScore: number;
+    riskLevel: 'Low (0-4)' | 'Medium (5-6 or 3 in single parameter)' | 'High (7+)';
+    colorCode: 'green' | 'amber' | 'red';
+    monitoringFrequency: string;
+    clinicalResponse: string;
+    parameterScores: {
+        respiratoryRate: { value: string; score: number };
+        oxygenSaturation: { value: string; score: number };
+        supplementalOxygen: { value: boolean; score: number };
+        systolicBP: { value: string; score: number };
+        pulseRate: { value: string; score: number };
+        consciousness: { value: string; score: number };
+        temperature: { value: string; score: number };
+    };
+    calculatedAt: number;
+}
+
+export interface PatientEducationDoc {
+    language: string; // e.g., 'English', 'Spanish', 'Urdu', 'Arabic', 'French'
+    conditionName: string;
+    simpleSummary: string;
+    whyPrescribedMedications: { drug: string; purpose: string; howToTake: string }[];
+    redFlagSigns: string[];
+    whatToDoInEmergency: string;
+    lifestyleAndDietAdvice: string[];
+    followUpPlan: string;
+    generatedAt: number;
+}
+
+export interface ClinicianAttestation {
+    id: string;
+    clinicianName: string;
+    role: string;
+    licenseNumber: string;
+    timestamp: number;
+    verifiedDiagnosesCount: number;
+    verifiedTreatmentsCount: number;
+    statement: string;
+    signatureDigitalHash: string;
+}
+
 export interface Encounter {
     id: string; // Case ID / Serial Number
     patientData: PatientData;
@@ -174,6 +247,12 @@ export interface Encounter {
     stepwisePlan?: ManagementStep[];
     labTracker?: LabTestOrder[];
     consultationMessages?: ConsultationMessage[];
+    riskScores?: ClinicalRiskScore[];
+    ddiAlerts?: DDIAlert[];
+    allergyAlerts?: AllergyAlert[];
+    news2?: NEWS2Assessment;
+    patientEducation?: PatientEducationDoc;
+    attestation?: ClinicianAttestation;
     timestamp: number; // Date of entry
     progressNotes: ProgressNote[];
     vitalsHistory: VitalsRecord[];

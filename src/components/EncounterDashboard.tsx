@@ -26,6 +26,13 @@ import StepwiseManagementView from './StepwiseManagementView';
 import LabTestTrackerView from './LabTestTrackerView';
 import OngoingTreatmentManager from './OngoingTreatmentManager';
 import NextRecommendationsAIConsultation from './NextRecommendationsAIConsultation';
+import { ClinicalCalculatorsModal } from './ClinicalCalculatorsModal';
+import { SafetyInterceptorBanner } from './SafetyInterceptorBanner';
+import { AmbientVoiceScribeModal } from './AmbientVoiceScribeModal';
+import { PatientEducationModal } from './PatientEducationModal';
+import { FHIRExportModal } from './FHIRExportModal';
+import { ClinicianAttestationModal } from './ClinicianAttestationModal';
+import { calculateNEWS2 } from '../services/clinicalCalculators';
 
 import { useCases } from '../CaseContext';
 import { useAuth } from '../AuthContext';
@@ -62,6 +69,15 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+
+    // Clinical modals state
+    const [isCalculatorsOpen, setIsCalculatorsOpen] = useState<boolean>(false);
+    const [isVoiceScribeOpen, setIsVoiceScribeOpen] = useState<boolean>(false);
+    const [isEducationOpen, setIsEducationOpen] = useState<boolean>(false);
+    const [isFHIROpen, setIsFHIROpen] = useState<boolean>(false);
+    const [isAttestationOpen, setIsAttestationOpen] = useState<boolean>(false);
+
+    const currentNEWS2 = calculateNEWS2(encounter.patientData.vitals || { temp: '', hr: '', rr: '', bp: '', spo2: '' });
 
     const isLimitedRole = profile?.role === 'Nurse' || profile?.role === 'MT' || profile?.role === 'WardBoy';
     const canManageTreatments = !isLimitedRole;
@@ -141,7 +157,7 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
     const renderTabContent = () => {
         switch (activeTab) {
             case 'case':
-                return <PatientCaseTab encounter={encounter} setEncounter={setEncounter} onGenerateDiagnoses={handleGenerateDiagnoses} isLoading={isLoading} error={error} isLimitedRole={isLimitedRole} onNext={() => setActiveTab('triage')} onOpenTriage={() => setActiveTab('triage')} />;
+                return <PatientCaseTab encounter={encounter} setEncounter={setEncounter} onGenerateDiagnoses={handleGenerateDiagnoses} isLoading={isLoading} error={error} isLimitedRole={isLimitedRole} onNext={() => setActiveTab('triage')} onOpenTriage={() => setActiveTab('triage')} onOpenVoiceScribe={() => setIsVoiceScribeOpen(true)} />;
             case 'triage':
                 return <TriageAssessmentView encounter={encounter} onUpdateEncounter={(updated) => setEncounter(updated)} onNext={() => setActiveTab('stepwise')} />;
             case 'stepwise':
@@ -167,7 +183,7 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
 
     return (
         <div className="animate-slide-up">
-            <div className="flex flex-col md:flex-row justify-between items-start mb-8 md:mb-12 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-8 gap-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-8 w-full md:w-auto">
                     <button onClick={onBack} className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-primary-100 border border-slate-200 shadow-sm rounded-2xl hover:bg-slate-50 transition-all active:scale-95 group shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-slate-400 group-hover:text-brand-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -202,6 +218,36 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
                                     ESI Level {encounter.triage.level}: {encounter.triage.acuityName.split(' ')[0]} ({encounter.triage.targetTimeMinutes === 0 ? 'STAT' : `<${encounter.triage.targetTimeMinutes}m`})
                                 </button>
                             )}
+
+                            {/* NEWS2 Score Badge */}
+                            <button
+                                onClick={() => setIsCalculatorsOpen(true)}
+                                className={`text-[10px] md:text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl border flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-sm ${
+                                    currentNEWS2.colorCode === 'red' ? 'bg-rose-500/10 text-rose-600 border-rose-300' :
+                                    currentNEWS2.colorCode === 'amber' ? 'bg-amber-500/10 text-amber-600 border-amber-300' :
+                                    'bg-emerald-500/10 text-emerald-600 border-emerald-300'
+                                }`}
+                                title="National Early Warning Score (Royal College of Physicians)"
+                            >
+                                <span className={`w-2 h-2 rounded-full ${
+                                    currentNEWS2.colorCode === 'red' ? 'bg-rose-500 animate-ping' :
+                                    currentNEWS2.colorCode === 'amber' ? 'bg-amber-500 animate-pulse' :
+                                    'bg-emerald-500'
+                                }`}></span>
+                                NEWS2: {currentNEWS2.totalScore} ({currentNEWS2.colorCode === 'red' ? 'High Risk' : currentNEWS2.colorCode === 'amber' ? 'Medium Risk' : 'Low Risk'})
+                            </button>
+
+                            {/* Attestation Badge */}
+                            {encounter.attestation && (
+                                <button
+                                    onClick={() => setIsAttestationOpen(true)}
+                                    className="text-[10px] md:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl border border-emerald-300 bg-emerald-500/10 text-emerald-600 flex items-center gap-1.5 hover:bg-emerald-500/20 transition-all shadow-sm"
+                                    title={`Digitally attested by ${encounter.attestation.clinicianName}`}
+                                >
+                                    <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-600" />
+                                    Attested ({encounter.attestation.clinicianName.split(' ')[0]})
+                                </button>
+                            )}
                         </div>
                         <p className="text-slate-400 text-[10px] md:text-sm font-semibold flex flex-wrap items-center gap-2 md:gap-3 uppercase tracking-widest">
                             <span className="text-slate-300">Case ID:</span> {encounter.id.slice(0, 12)}...
@@ -222,6 +268,55 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
                             <span key={tag} className="bg-primary-100 text-brand-600 text-[9px] md:text-[10px] font-bold px-3 md:px-4 py-1.5 rounded-xl uppercase tracking-widest border border-brand-100 shadow-sm">{tag}</span>
                         ))}
                     </div>
+                </div>
+            </div>
+
+            {/* Minimalist Clinical Quick Tools Bar */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6 p-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Quick Tools:</span>
+                    <button
+                        onClick={() => setIsVoiceScribeOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                    >
+                        <span>🎙️</span>
+                        <span>Ambient Scribe</span>
+                    </button>
+                    <button
+                        onClick={() => setIsCalculatorsOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                    >
+                        <span>🧮</span>
+                        <span>Risk Calculators</span>
+                    </button>
+                    <button
+                        onClick={() => setIsEducationOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                    >
+                        <span>📖</span>
+                        <span>Patient Aftercare</span>
+                    </button>
+                    <button
+                        onClick={() => setIsAttestationOpen(true)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 border ${
+                            encounter.attestation
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                                : 'bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border-slate-200'
+                        }`}
+                    >
+                        <span>{encounter.attestation ? '✅' : '✍️'}</span>
+                        <span>{encounter.attestation ? 'Signed Attestation' : 'Sign & Attest'}</span>
+                    </button>
+                    <button
+                        onClick={() => setIsFHIROpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-brand-50 hover:text-brand-600 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+                    >
+                        <span>🌐</span>
+                        <span>HL7 FHIR R4</span>
+                    </button>
+                </div>
+                <div className="shrink-0">
+                    <SafetyInterceptorBanner encounter={encounter} onOpenChangeTreatment={() => setActiveTab('treatment')} />
                 </div>
             </div>
 
@@ -248,6 +343,45 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
             <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 {renderTabContent()}
             </div>
+
+            {/* Clinical Modals */}
+            {isCalculatorsOpen && (
+                <ClinicalCalculatorsModal
+                    encounter={encounter}
+                    onUpdateEncounter={(updated) => setEncounter(updated)}
+                    onClose={() => setIsCalculatorsOpen(false)}
+                />
+            )}
+
+            {isVoiceScribeOpen && (
+                <AmbientVoiceScribeModal
+                    encounter={encounter}
+                    onUpdateEncounter={(updated) => setEncounter(updated)}
+                    onClose={() => setIsVoiceScribeOpen(false)}
+                />
+            )}
+
+            {isEducationOpen && (
+                <PatientEducationModal
+                    encounter={encounter}
+                    onClose={() => setIsEducationOpen(false)}
+                />
+            )}
+
+            {isFHIROpen && (
+                <FHIRExportModal
+                    encounter={encounter}
+                    onClose={() => setIsFHIROpen(false)}
+                />
+            )}
+
+            {isAttestationOpen && (
+                <ClinicianAttestationModal
+                    encounter={encounter}
+                    onUpdateEncounter={(updated) => setEncounter(updated)}
+                    onClose={() => setIsAttestationOpen(false)}
+                />
+            )}
         </div>
     );
 };
@@ -335,8 +469,9 @@ interface PatientCaseTabProps {
     isLimitedRole?: boolean;
     onNext: () => void;
     onOpenTriage?: () => void;
+    onOpenVoiceScribe?: () => void;
 }
-const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter, onGenerateDiagnoses, isLoading, error, isLimitedRole, onNext, onOpenTriage }) => {
+const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter, onGenerateDiagnoses, isLoading, error, isLimitedRole, onNext, onOpenTriage, onOpenVoiceScribe }) => {
     const investigationTemplates = {
         "CBC": "Hemoglobin: \nWBC: \nPlatelets: ",
         "Renal Panel": "Sodium: \nPotassium: \nChloride: \nBicarbonate: \nBUN: \nCreatinine: ",
@@ -570,6 +705,17 @@ const PatientCaseTab: React.FC<PatientCaseTabProps> = ({ encounter, setEncounter
                             </div>
                             <h3 className="font-bold text-slate-900 tracking-tight text-base md:text-lg font-display">Clinical Presentation</h3>
                         </div>
+                        {onOpenVoiceScribe && (
+                            <button
+                                onClick={onOpenVoiceScribe}
+                                type="button"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs font-bold transition-all border border-sky-200 active:scale-95 shadow-xs"
+                                title="Ambient Voice Dictation Scribe"
+                            >
+                                <span className="text-sm">🎙️</span>
+                                <span>Ambient Dictate</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="space-y-6 md:space-y-8">
