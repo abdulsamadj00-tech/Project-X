@@ -1,0 +1,457 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   THEME 1 — MIDNIGHT CYAN (Default Dark)
+   Dark backgrounds → Bright white/cyan fonts
+   ============================================================ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Deep dark backgrounds (low numbers = darkest) */
+  --color-primary-50: #0f1219;
+  --color-primary-100: #141824;
+  --color-primary-200: #1a2030;
+  --color-primary-300: #232a3f;
+  --color-primary-400: #3b4561;
+  /* ---- contrast boundary ---- */
+  --color-primary-500: #8b95b3;
+  --color-primary-600: #a8b2cc;
+  --color-primary-700: #c2cbe0;
+  --color-primary-800: #dde3f0;
+  --color-primary-900: #f0f2f8;
+
+  /*
+   * IMPORTANT: Keep white and black as their real values.
+   * Components use text-white for maximum-contrast headings.
+   */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Slate scale inverted for dark mode:
+     bg-slate-50 = dark bg, text-slate-900 = bright text */
+  --color-slate-50: #0f1219;
+  --color-slate-100: #1a2030;
+  --color-slate-200: #232a3f;
+  --color-slate-300: #3b4561;
+  --color-slate-400: #8b95b3;
+  --color-slate-500: #a8b2cc;
+  --color-slate-600: #c2cbe0;
+  --color-slate-700: #dde3f0;
+  --color-slate-800: #f0f2f8;
+  --color-slate-900: #ffffff;
+
+  /* Neon Cyan Brand Colors */
+  --color-brand-50: #e0fcff;
+  --color-brand-100: #b3f6ff;
+  --color-brand-200: #80eeff;
+  --color-brand-300: #4de5ff;
+  --color-brand-400: #26ddff;
+  --color-brand-500: #00d5ff;
+  --color-brand-600: #00b8e6;
+  --color-brand-700: #008fcc;
+  --color-brand-800: #006eb3;
+  --color-brand-900: #005299;
+
+  /* Vibrant Accent (Pink/Purple) */
+  --color-accent-50: #ffebf5;
+  --color-accent-100: #ffd1e8;
+  --color-accent-200: #ffb3d9;
+  --color-accent-300: #ff8fc9;
+  --color-accent-400: #ff75bd;
+  --color-accent-500: #ff57b0;
+  --color-accent-600: #e6409b;
+  --color-accent-700: #cc2c86;
+  --color-accent-800: #b31c73;
+  --color-accent-900: #990f61;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* Semantic colors */
+  --color-emerald-50: rgba(16, 185, 129, 0.08);
+  --color-emerald-100: rgba(16, 185, 129, 0.15);
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #34d399;
+
+  --color-amber-50: rgba(245, 158, 11, 0.08);
+  --color-amber-100: rgba(245, 158, 11, 0.15);
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #fbbf24;
+
+  --color-rose-50: rgba(239, 68, 68, 0.08);
+  --color-rose-100: rgba(239, 68, 68, 0.15);
+  --color-rose-400: #fb7185;
+  --color-rose-500: #ef4444;
+  --color-rose-600: #dc2626;
+
+  --color-indigo-50: rgba(99, 102, 241, 0.08);
+  --color-indigo-100: rgba(99, 102, 241, 0.15);
+  --color-indigo-600: #818cf8;
+
+  --color-green-500: #22c55e;
+  --color-red-50: rgba(239, 68, 68, 0.08);
+  --color-red-100: rgba(239, 68, 68, 0.15);
+  --color-red-600: #ef4444;
+  --color-red-900: #fca5a5;
+  --color-red-700: #fb7185;
+}
+
+
+/* ============================================================
+   THEME 2 — IVORY LIGHT
+   Bright backgrounds → Dark navy fonts
+   ============================================================ */
+[data-theme="ivory"] {
+  --color-primary-50: #f8f9fc;
+  --color-primary-100: #ffffff;
+  --color-primary-200: #f1f4f9;
+  --color-primary-300: #dce3ef;
+  --color-primary-400: #b8c4d8;
+  --color-primary-500: #6b7a96;
+  --color-primary-600: #4a5672;
+  --color-primary-700: #364259;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+
+  /* Standard (non-inverted) slate for light theme:
+     bg-slate-50 = light bg, text-slate-900 = dark text */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #172554;
+
+  --color-accent-50: #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-200: #ddd6fe;
+  --color-accent-300: #c4b5fd;
+  --color-accent-400: #a78bfa;
+  --color-accent-500: #7c3aed;
+  --color-accent-600: #6d28d9;
+  --color-accent-700: #5b21b6;
+  --color-accent-800: #4c1d95;
+  --color-accent-900: #3b0764;
+
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-600: #4f46e5;
+
+  --color-green-500: #22c55e;
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-900: #7f1d1d;
+}
+
+/* ============================================================
+   THEME 3 — SUNSET WARM
+   Warm dark backgrounds → Warm cream/gold fonts
+   ============================================================ */
+[data-theme="sunset"] {
+  --color-primary-50: #1a1410;
+  --color-primary-100: #221c16;
+  --color-primary-200: #2c241c;
+  --color-primary-300: #3d3226;
+  --color-primary-400: #5c4d3c;
+  --color-primary-500: #9c8c78;
+  --color-primary-600: #c4b49e;
+  --color-primary-700: #ddd0bb;
+  --color-primary-800: #f0e6d4;
+  --color-primary-900: #fef3c7;
+
+  /* Inverted slate for sunset dark mode (warm-tinted) */
+  --color-slate-50: #1a1410;
+  --color-slate-100: #2c241c;
+  --color-slate-200: #3d3226;
+  --color-slate-300: #5c4d3c;
+  --color-slate-400: #9c8c78;
+  --color-slate-500: #c4b49e;
+  --color-slate-600: #ddd0bb;
+  --color-slate-700: #f0e6d4;
+  --color-slate-800: #fef3c7;
+  --color-slate-900: #fffbeb;
+
+  --color-brand-50: #fffbeb;
+  --color-brand-100: #fef3c7;
+  --color-brand-200: #fde68a;
+  --color-brand-300: #fcd34d;
+  --color-brand-400: #fbbf24;
+  --color-brand-500: #f59e0b;
+  --color-brand-600: #d97706;
+  --color-brand-700: #b45309;
+  --color-brand-800: #92400e;
+  --color-brand-900: #78350f;
+
+  --color-accent-50: #fff1f2;
+  --color-accent-100: #ffe4e6;
+  --color-accent-200: #fecdd3;
+  --color-accent-300: #fda4af;
+  --color-accent-400: #fb7185;
+  --color-accent-500: #f43f5e;
+  --color-accent-600: #e11d48;
+  --color-accent-700: #be123c;
+  --color-accent-800: #9f1239;
+  --color-accent-900: #881337;
+
+  --color-emerald-50: rgba(16, 185, 129, 0.1);
+  --color-emerald-100: rgba(16, 185, 129, 0.18);
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #34d399;
+
+  --color-amber-50: rgba(245, 158, 11, 0.1);
+  --color-amber-100: rgba(245, 158, 11, 0.18);
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #fbbf24;
+
+  --color-rose-50: rgba(239, 68, 68, 0.1);
+  --color-rose-100: rgba(239, 68, 68, 0.18);
+  --color-rose-400: #fb7185;
+  --color-rose-500: #ef4444;
+  --color-rose-600: #dc2626;
+
+  --color-indigo-50: rgba(99, 102, 241, 0.1);
+  --color-indigo-100: rgba(99, 102, 241, 0.18);
+  --color-indigo-600: #818cf8;
+
+  --color-green-500: #22c55e;
+  --color-red-50: rgba(239, 68, 68, 0.1);
+  --color-red-100: rgba(239, 68, 68, 0.18);
+  --color-red-600: #ef4444;
+  --color-red-700: #fb7185;
+  --color-red-900: #fca5a5;
+}
+
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  body {
+    @apply bg-primary-50 text-primary-900 font-sans antialiased selection:bg-brand-500/30 selection:text-brand-100;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  
+  /* Headings: bright on dark themes, dark on light theme */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-primary-900;
+  }
+
+  p {
+    @apply text-primary-600;
+  }
+}
+
+/* Ivory: use dark grid lines on light bg */
+[data-theme="ivory"] body {
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+}
+
+/* Sunset: warm tinted grid */
+[data-theme="sunset"] body {
+  background-image: 
+    linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+}
+
+
+/* ============================================================
+   COMPONENT CLASSES
+   ============================================================ */
+@layer components {
+  .btn-primary {
+    @apply bg-brand-500 text-white font-bold py-3 px-6 rounded-2xl hover:bg-brand-400 transition-all shadow-[0_0_20px_rgba(0,213,255,0.3)] hover:shadow-[0_0_30px_rgba(0,213,255,0.6)] active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-primary-200/50 backdrop-blur-md text-primary-900 border border-primary-300/50 font-semibold py-3 px-6 rounded-2xl hover:bg-primary-300/50 hover:border-brand-500/30 transition-all shadow-sm active:scale-[0.96] flex items-center justify-center gap-2;
+  }
+
+  .btn-accent {
+    @apply bg-gradient-to-r from-accent-600 to-accent-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-accent-500 hover:to-accent-400 transition-all shadow-[0_0_20px_rgba(255,87,176,0.3)] hover:shadow-[0_0_30px_rgba(255,87,176,0.6)] active:scale-[0.96] flex items-center justify-center gap-2;
+  }
+
+  .input-field {
+    @apply w-full p-4 border border-primary-300/50 rounded-2xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all bg-primary-100/50 backdrop-blur-md shadow-inner placeholder:text-primary-500 text-primary-900;
+  }
+
+  .insta-card {
+    @apply bg-primary-100/60 backdrop-blur-2xl rounded-[24px] border border-primary-300/30 shadow-[0_8px_30px_rgb(0,0,0,0.4)] overflow-hidden transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,213,255,0.15)] hover:-translate-y-1 hover:border-brand-500/20;
+  }
+
+  .glass-panel {
+    @apply bg-primary-100/40 backdrop-blur-3xl border border-primary-300/10 shadow-2xl;
+  }
+
+  .status-badge {
+    @apply px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary-300/50 text-primary-800 border border-primary-400/30;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 text-primary-600 hover:text-primary-900 hover:bg-primary-200/50;
+  }
+
+  .nav-link-active {
+    @apply bg-primary-200/80 text-brand-400 font-bold border border-primary-300/50;
+  }
+}
+
+/* Ivory theme: softer shadows */
+[data-theme="ivory"] .insta-card {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.08);
+}
+[data-theme="ivory"] .insta-card:hover {
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.1), 0 2px 6px rgba(0,0,0,0.06);
+}
+[data-theme="ivory"] .btn-primary {
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+[data-theme="ivory"] .btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* ============================================================
+   IVORY THEME: text-white fix
+   On light theme, "text-white" headings should become dark
+   ============================================================ */
+[data-theme="ivory"] .text-white {
+  color: #0f172a !important;
+}
+[data-theme="ivory"] .text-primary-50 {
+  color: #ffffff !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-primary-50;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400/50 rounded-full hover:bg-brand-500/50 border-2 border-primary-50;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   MESH BACKGROUNDS — Per-Theme
+   ============================================================ */
+
+/* Midnight: cyan/pink glow */
+.bg-mesh {
+  background-color: var(--color-primary-50);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(0, 213, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(255, 87, 176, 0.06), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(0, 213, 255, 0.05), transparent 40%),
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  background-attachment: fixed;
+}
+
+/* Ivory: blue/purple glow on white */
+[data-theme="ivory"] .bg-mesh {
+  background-color: var(--color-primary-50);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.04), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(37, 99, 235, 0.03), transparent 40%),
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Sunset: amber/rose glow */
+[data-theme="sunset"] .bg-mesh {
+  background-color: var(--color-primary-50);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(245, 158, 11, 0.1), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(244, 63, 94, 0.07), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(245, 158, 11, 0.06), transparent 40%),
+    linear-gradient(rgba(245,158,11,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,158,11,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+}
+
