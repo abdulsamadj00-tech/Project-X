@@ -116,10 +116,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ encounters, onSelectEncoun
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {[
-                        { title: 'Sepsis & CAP', patient: 'Eleanor Vance, 68F', badge: 'ESI Level 2', color: 'border-amber-500/40 bg-amber-500/5', desc: 'CURB-65 = 3, lobar pneumonia, lactate 2.8', idx: 0 },
-                        { title: 'Stroke STAT', patient: 'David Kowalski, 71M', badge: 'ESI Level 1', color: 'border-rose-500/40 bg-rose-500/5', desc: 'NIHSS 16, onset 45m, thrombolysis window', idx: 1 },
-                        { title: 'Panic & DSM-5', patient: 'Sarah Jenkins, 32F', badge: 'ESI Level 3', color: 'border-sky-500/40 bg-sky-500/5', desc: 'Acute panic episode vs ischemia, SSRI/CBT', idx: 2 },
-                        { title: 'Acute Abdomen', patient: 'Marcus Chen, 24M', badge: 'ESI Level 3', color: 'border-emerald-500/40 bg-emerald-500/5', desc: 'Appendicitis, McBurney sign, surgical prep', idx: 3 },
+                        { title: 'Sepsis & CAP', patient: 'Parveen Akhtar, 68F', badge: 'ESI Level 2', color: 'border-amber-500/40 bg-amber-500/5', desc: 'CURB-65 = 3, lobar pneumonia, lactate 2.8', idx: 0 },
+                        { title: 'Stroke STAT', patient: 'Muhammad Tariq, 71M', badge: 'ESI Level 1', color: 'border-rose-500/40 bg-rose-500/5', desc: 'NIHSS 16, onset 45m, thrombolysis window', idx: 1 },
+                        { title: 'Panic & DSM-5', patient: 'Ayesha Siddiqa, 32F', badge: 'ESI Level 3', color: 'border-sky-500/40 bg-sky-500/5', desc: 'Acute panic episode vs ischemia, SSRI/CBT', idx: 2 },
+                        { title: 'Acute Abdomen', patient: 'Hamza Farooq, 24M', badge: 'ESI Level 3', color: 'border-emerald-500/40 bg-emerald-500/5', desc: 'Appendicitis, McBurney sign, surgical prep', idx: 3 },
                     ].map((c) => (
                         <button
                             key={c.idx}

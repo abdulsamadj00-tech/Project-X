@@ -6,7 +6,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         status: 'Active',
         tags: ['Pulmonology', 'Critical Care', 'Sepsis-3', 'CURB-65', 'ESI-2 Emergent'],
         patientData: {
-            name: 'Eleanor Vance',
+            name: 'Parveen Akhtar',
             age: '68',
             sex: 'Female',
             primaryComplaint: 'Severe productive cough, high fever, and shortness of breath for 4 days',
@@ -58,7 +58,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
             ],
             clinicalRationale: 'Severe Community-Acquired Pneumonia with Sepsis (CURB-65 = 3: Confusion, Urea > 19, RR >= 30, Age >= 65). High risk of rapid respiratory decompensation.',
             lastAssessed: Date.now() - 3600000,
-            assessedBy: 'Dr. Sarah Connor, MD (Emergency Medicine)'
+            assessedBy: 'Dr. Aiman Fatima, FCPS (Emergency Medicine)'
         },
         provisionalDiagnoses: [
             {
@@ -112,7 +112,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         finalDiagnosis: null,
         treatments: [
             {
-                id: 'tx-vance-1',
+                id: 'tx-parveen-1',
                 drugName: 'Ceftriaxone',
                 dosage: '2 g',
                 route: 'Intravenous (IV)',
@@ -125,7 +125,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
                 history: []
             },
             {
-                id: 'tx-vance-2',
+                id: 'tx-parveen-2',
                 drugName: 'Azithromycin',
                 dosage: '500 mg',
                 route: 'Intravenous (IV)',
@@ -138,7 +138,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
                 history: []
             },
             {
-                id: 'tx-vance-3',
+                id: 'tx-parveen-3',
                 drugName: 'Lactated Ringer’s Solution',
                 dosage: '1000 mL',
                 route: 'Intravenous (IV)',
@@ -224,7 +224,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         status: 'Active',
         tags: ['Neurology', 'Stroke STAT', 'FAST-Positive', 'ESI-1 Resuscitation'],
         patientData: {
-            name: 'David Kowalski',
+            name: 'Muhammad Tariq',
             age: '71',
             sex: 'Male',
             primaryComplaint: 'Sudden onset right-sided weakness and inability to speak (45 min ago)',
@@ -271,7 +271,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
             ],
             clinicalRationale: 'Acute Ischemic Stroke presenting at 45 minutes from symptom onset. Every minute of delay loses 1.9 million neurons. Door-to-needle goal < 30 minutes.',
             lastAssessed: Date.now() - 1800000,
-            assessedBy: 'Dr. Michael Chang, MD (Stroke Neurologist)'
+            assessedBy: 'Dr. Tariq Mehmood, FCPS (Stroke Neurologist)'
         },
         provisionalDiagnoses: [
             {
@@ -301,7 +301,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         finalDiagnosis: null,
         treatments: [
             {
-                id: 'tx-kowalski-1',
+                id: 'tx-tariq-1',
                 drugName: 'Tenecteplase (TNK-tPA)',
                 dosage: '0.25 mg/kg (Max 25 mg)',
                 route: 'Intravenous (IV)',
@@ -314,7 +314,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
                 history: []
             },
             {
-                id: 'tx-kowalski-2',
+                id: 'tx-tariq-2',
                 drugName: 'Labetalol',
                 dosage: '10-20 mg',
                 route: 'Intravenous (IV)',
@@ -380,7 +380,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         status: 'Active',
         tags: ['Psychiatry', 'DSM-5', 'ICD-11', 'Panic Disorder', 'ESI-3 Urgent'],
         patientData: {
-            name: 'Sarah Jenkins',
+            name: 'Ayesha Siddiqa',
             age: '32',
             sex: 'Female',
             primaryComplaint: 'Severe heart pounding, shortness of breath, trembling, and intense fear of dying',
@@ -427,7 +427,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
             ],
             clinicalRationale: 'Panic Disorder with Agoraphobia (DSM-5 300.01 / ICD-11 6B01). Acute panic episode mimicking myocardial ischemia, ruled out with normal ECG and cardiac enzymes. ESI Level 3 Urgent.',
             lastAssessed: Date.now() - 7200000,
-            assessedBy: 'Dr. Emily Vance, MD (Emergency & Consult Psychiatry)'
+            assessedBy: 'Dr. Sadia Rehman, FCPS (Consultant Psychiatrist)'
         },
         provisionalDiagnoses: [
             {
@@ -480,7 +480,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         finalDiagnosis: null,
         treatments: [
             {
-                id: 'tx-jenkins-1',
+                id: 'tx-ayesha-1',
                 drugName: 'Sertraline (Zoloft)',
                 dosage: '25 mg (titrating to 50 mg after 7 days)',
                 route: 'Oral (PO)',
@@ -493,7 +493,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
                 history: []
             },
             {
-                id: 'tx-jenkins-2',
+                id: 'tx-ayesha-2',
                 drugName: 'Propranolol',
                 dosage: '10-20 mg',
                 route: 'Oral (PO)',
@@ -565,7 +565,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         status: 'Active',
         tags: ['Gastroenterology', 'General Surgery', 'Acute Abdomen', 'ESI-3 Urgent'],
         patientData: {
-            name: 'Marcus Chen',
+            name: 'Hamza Farooq',
             age: '24',
             sex: 'Male',
             primaryComplaint: 'Severe right lower quadrant abdominal pain, nausea, and low-grade fever',
@@ -612,7 +612,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
             ],
             clinicalRationale: 'Acute appendicitis with localized peritoneal signs (Alvarado score 8). Requires prompt surgical intervention before perforation. ESI Level 3 Urgent.',
             lastAssessed: Date.now() - 5400000,
-            assessedBy: 'Dr. James Rodriguez, MD (Emergency Surgery)'
+            assessedBy: 'Dr. Kamran Siddiqui, FCPS (General & Emergency Surgery)'
         },
         provisionalDiagnoses: [
             {
@@ -644,7 +644,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
         finalDiagnosis: null,
         treatments: [
             {
-                id: 'tx-chen-1',
+                id: 'tx-hamza-1',
                 drugName: 'Cefoxitin',
                 dosage: '2 g',
                 route: 'Intravenous (IV)',
@@ -657,7 +657,7 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
                 history: []
             },
             {
-                id: 'tx-chen-2',
+                id: 'tx-hamza-2',
                 drugName: 'Paracetamol (Acetaminophen)',
                 dosage: '1000 mg',
                 route: 'Intravenous (IV)',
@@ -726,7 +726,51 @@ export const RANDOM_SAMPLE_CASES: Omit<Encounter, 'id' | 'timestamp'>[] = [
     }
 ];
 
+export const PAKISTANI_FEMALE_NAMES = [
+    'Parveen Akhtar',
+    'Ayesha Siddiqa',
+    'Bilqis Bano',
+    'Fatima Zahra',
+    'Zainab Bibi',
+    'Sana Malik',
+    'Farhat Sultana',
+    'Nasreen Begum',
+    'Rabia Basri',
+    'Samina Kausar',
+    'Tahira Yasmin',
+    'Bushra Ansari',
+    'Khadija Noor',
+    'Sadia Batool',
+    'Zubaida Khatoon'
+];
+
+export const PAKISTANI_MALE_NAMES = [
+    'Muhammad Tariq',
+    'Hamza Farooq',
+    'Abdul Rehman',
+    'Ghulam Rasool',
+    'Bashir Ahmed',
+    'Bilal Khan',
+    'Usama Sheikh',
+    'Zeeshan Ali',
+    'Kamran Ashraf',
+    'Nadeem Akhtar',
+    'Farhan Qureshi',
+    'Asadullah Butt',
+    'Rizwan Haider',
+    'Waqas Munir',
+    'Shahid Afridi'
+];
+
 export function getRandomSampleCase(): Omit<Encounter, 'id' | 'timestamp'> {
     const randomIndex = Math.floor(Math.random() * RANDOM_SAMPLE_CASES.length);
-    return JSON.parse(JSON.stringify(RANDOM_SAMPLE_CASES[randomIndex]));
+    const caseClone: Omit<Encounter, 'id' | 'timestamp'> = JSON.parse(JSON.stringify(RANDOM_SAMPLE_CASES[randomIndex]));
+
+    // Assign an authentic Pakistani name matching patient's gender
+    const isFemale = caseClone.patientData.sex === 'Female';
+    const pool = isFemale ? PAKISTANI_FEMALE_NAMES : PAKISTANI_MALE_NAMES;
+    const randomName = pool[Math.floor(Math.random() * pool.length)];
+    caseClone.patientData.name = randomName;
+
+    return caseClone;
 }
