@@ -39,14 +39,15 @@
     </script>
   </head>
   <body>
-    <div id="error-container" style="color: #ff5757; padding: 20px; font-family: 'Inter', sans-serif; white-space: pre-wrap; background: #0f1219;"></div>
+    <div id="error-container" style="display: none; color: #ff5757; padding: 20px; font-family: 'Inter', sans-serif; white-space: pre-wrap; background: #0f1219;"></div>
     <div id="root"></div>
     <script>
       window.addEventListener('error', function(e) {
-        document.getElementById('error-container').innerText += e.message + '\n';
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        document.getElementById('error-container').innerText += e.reason + '\n';
+        var el = document.getElementById('error-container');
+        if (el && !document.getElementById('root').hasChildNodes()) {
+          el.style.display = 'block';
+          el.innerText += (e.message || e) + '\n';
+        }
       });
     </script>
     <script type="module" src="/src/index.tsx"></script>

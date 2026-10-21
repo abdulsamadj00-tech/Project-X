@@ -4,54 +4,19 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import Stripe from "stripe";
+import { keyPool } from "./api/geminiKeyPool";
 
 dotenv.config();
+// Refresh key pool with loaded environment variables
+keyPool.refreshKeys();
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-
-const GEMINI_MODELS = [
-  'gemini-3-flash-preview',
-  'gemini-3.1-flash-lite',
-  'gemini-3.1-flash-lite-preview',
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
-  'gemini-3.6-flash',
-  'gemini-3.5-flash',
-  'gemini-flash-latest'
-];
-
-async function callGeminiAPI(apiKey: string, modelName: string, requestBody: any): Promise<{ ok: boolean; status: number; data?: any; error?: string }> {
-  const endpoints = [
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`,
-  ];
-
-  for (const url of endpoints) {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      if (response.status === 404) continue;
-      return { ok: false, status: response.status, error: errText };
-    }
-
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return { ok: true, status: 200, data: { text } };
-  }
-
-  return { ok: false, status: 404, error: `Model ${modelName} not found on any endpoint` };
-}
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '20mb' }));
 
   // Request logger
   app.use((req, res, next) => {
@@ -59,66 +24,48 @@ async function startServer() {
     next();
   });
 
-  // API routes
+  // API health route
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({
+      status: "ok",
+      activeKeysCount: keyPool.getKeyCount(),
+      poolStatus: keyPool.getPoolStatus(),
+    });
   });
 
-  // --- Gemini AI Proxy (works in both dev and production) ---
+  // Status check for Gemini pool
+  app.get("/api/gemini", (req, res) => {
+    res.json({
+      status: "ok",
+      totalKeys: keyPool.getKeyCount(),
+      pool: keyPool.getPoolStatus(),
+    });
+  });
+
+  // --- Gemini AI Proxy (Robust key pooling, failover & rate-limit auto-switch) ---
   app.post("/api/gemini", async (req: any, res: any) => {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: "GEMINI_API_KEY not configured on server. Add it to your .env file." });
-    }
-
     try {
-      const { prompt, schema, model } = req.body;
-      if (!prompt) {
-        return res.status(400).json({ error: "Missing prompt in request body." });
+      const { prompt, parts, contents, schema, model } = req.body || {};
+
+      if (!prompt && !parts && !contents) {
+        return res.status(400).json({ error: "Missing prompt, parts, or contents in request body." });
       }
 
-      const requestBody: any = {
-        contents: [{ parts: [{ text: prompt }] }],
-      };
+      const result = await keyPool.generateContent({
+        prompt,
+        parts,
+        contents,
+        schema,
+        model,
+      });
 
-      if (schema) {
-        requestBody.generationConfig = {
-          responseMimeType: 'application/json',
-          responseSchema: schema,
-        };
-      }
-
-      const modelsToTry = model
-        ? [model, ...GEMINI_MODELS.filter((m) => m !== model)]
-        : GEMINI_MODELS;
-
-      let lastError = '';
-      let lastStatus = 500;
-
-      for (const modelName of modelsToTry) {
-        for (let attempt = 0; attempt < 2; attempt++) {
-          if (attempt > 0) await new Promise((r) => setTimeout(r, 2000 * attempt));
-
-          console.log(`Trying model: ${modelName} (attempt ${attempt + 1})`);
-          const result = await callGeminiAPI(apiKey, modelName, requestBody);
-
-          if (result.ok) {
-            console.log(`Success with model: ${modelName}`);
-            return res.status(200).json(result.data);
-          }
-
-          lastError = result.error || 'Unknown error';
-          lastStatus = result.status;
-
-          if (result.status === 429 || result.status === 400 || result.status === 404) break;
-        }
-      }
-
-      console.error('All models failed. Last error:', lastError);
-      return res.status(lastStatus).json({ error: `Gemini API error: ${lastStatus}`, details: lastError });
+      return res.status(200).json(result);
     } catch (error: any) {
-      console.error('Server proxy error:', error);
-      return res.status(500).json({ error: error.message || 'Internal server error' });
+      console.error('[Server Gemini Proxy] Error:', error);
+      return res.status(500).json({
+        error: error.message || 'Internal AI proxy error',
+        pool: keyPool.getPoolStatus(),
+      });
     }
   });
 
@@ -194,7 +141,7 @@ async function startServer() {
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`\n🚀 MediDx server running at http://localhost:${PORT}`);
-    console.log(`   Gemini API: ${process.env.GEMINI_API_KEY ? '✅ Configured' : '❌ Not configured (add GEMINI_API_KEY to .env)'}`);
+    console.log(`   Gemini AI Pool: ✅ Configured (${keyPool.getKeyCount()} active keys with auto-failover)`);
     console.log(`   Stripe: ${process.env.STRIPE_SECRET_KEY ? '✅ Configured' : '⚠️  Not configured (optional)'}\n`);
   });
 }

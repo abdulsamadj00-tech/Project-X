@@ -1,4 +1,4 @@
-﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Telemedicine Pro Subscription',
+              name: 'MediDx Pro Subscription',
               description: 'Unlock advanced AI diagnostics and unlimited reports.',
             },
             unit_amount: 2900,

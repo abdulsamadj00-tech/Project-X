@@ -227,13 +227,6 @@ export const synthesizeReportWithAI = async (
     currentContent: EditableReportContent
 ): Promise<EditableReportContent> => {
     try {
-        const apiKey = process.env.API_KEY || (typeof window !== 'undefined' ? (window as any).GEMINI_API_KEY : '');
-        if (!apiKey) {
-            // High fidelity clinical heuristic generation if API key is in server env
-            return generatePolishedLocalReport(encounter, reportType, doctorDetails, currentContent);
-        }
-
-        const ai = new GoogleGenAI({ apiKey });
         const prompt = `You are a Chief Medical Officer and Clinical Documentation Specialist.
 Generate a polished, concise, authentic bilingual (English and Urdu) medical report summary for the following encounter.
 Report Type: ${reportType.toUpperCase()}
@@ -259,17 +252,25 @@ Output STRICTLY valid JSON with these keys:
   "lamaSpecificRefusalsUr": "..."
 }`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                temperature: 0.2,
-                responseMimeType: 'application/json'
-            }
+        const res = await fetch('/api/gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, model: 'gemini-3.8-flash' })
         });
 
-        const text = response.text?.trim() || '{}';
-        const parsed = JSON.parse(text);
+        if (!res.ok) {
+            return generatePolishedLocalReport(encounter, reportType, doctorDetails, currentContent);
+        }
+
+        const data = await res.json();
+        const text = data.text?.trim() || '{}';
+        
+        // Clean markdown code blocks if present
+        let cleaned = text;
+        if (cleaned.startsWith('```')) {
+            cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+        }
+        const parsed = JSON.parse(cleaned);
 
         return {
             ...currentContent,
