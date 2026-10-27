@@ -21,6 +21,8 @@ import { StethoscopeIcon } from './components/icons';
 import { Toaster, toast } from 'sonner';
 import ErrorBoundary from './components/ErrorBoundary';
 import SystemAudit from './components/SystemAudit';
+import AuditTrailModal from './components/AuditTrailModal';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
 
 const BLANK_PATIENT_DATA: PatientData = {
     name: '',
@@ -39,7 +41,8 @@ const BLANK_PATIENT_DATA: PatientData = {
 
 const AppContent: React.FC = () => {
     const { user, profile, signIn, signInAsGuest, logout, updateProfile, loading: authLoading } = useAuth();
-    const { encounters, loading: casesLoading, createEncounter, addRandomCase, updateEncounter, deleteEncounter } = useCases();
+    const { encounters, loading: casesLoading, createEncounter, addRandomCase, updateEncounter, deleteEncounter, pendingSyncCount, triggerManualSync } = useCases();
+    const { isOnline } = useNetworkStatus();
     
     const [activeView, setActiveView] = useState<'records' | 'encounter' | 'clinicians' | 'dashboard'>('dashboard');
     const [selectedEncounterId, setSelectedEncounterId] = useState<string | null>(null);
@@ -51,6 +54,7 @@ const AppContent: React.FC = () => {
     const [isPricingModalOpen, setIsPricingModalOpen] = useState<boolean>(false);
     const [isPro, setIsPro] = useState<boolean>(false);
     const [isAuditOpen, setIsAuditOpen] = useState<boolean>(false);
+    const [isAuditTrailOpen, setIsAuditTrailOpen] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const activeEncounter = encounters.find(e => e.id === selectedEncounterId) || null;
@@ -226,12 +230,28 @@ const AppContent: React.FC = () => {
                 onLogout={logout}
                 onSwitchAccount={handleSwitchAccount}
                 onOpenAudit={() => setIsAuditOpen(true)}
+                onOpenAuditTrail={() => setIsAuditTrailOpen(true)}
                 isSaving={isSaving}
                 isPro={isPro}
                 role={profile?.role}
+                isOnline={isOnline}
+                pendingSyncCount={pendingSyncCount}
+                onManualSync={async () => {
+                    const res = await triggerManualSync();
+                    if (res.success > 0) {
+                        toast.success(`Successfully synchronized ${res.success} case(s) to cloud.`);
+                    }
+                }}
             />
+            {!isOnline && (
+                <div className="bg-amber-500/15 border-b border-amber-500/30 text-amber-300 text-xs py-2 px-4 text-center font-medium flex items-center justify-center gap-2 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span><strong>Offline Mode Active:</strong> Patient records, triage scoring, treatments, progress notes, and PDF reports are fully functional locally. AI diagnosis generation will resume when online.</span>
+                </div>
+            )}
             <main className="container mx-auto p-4 lg:p-8 animate-slide-up">
                 {isAuditOpen && <SystemAudit encounters={encounters} onClose={() => setIsAuditOpen(false)} />}
+                {isAuditTrailOpen && <AuditTrailModal onClose={() => setIsAuditTrailOpen(false)} />}
                 <ErrorBoundary>
                     {activeView === 'dashboard' ? (
                         <Dashboard 

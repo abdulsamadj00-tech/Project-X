@@ -16,11 +16,20 @@ import {
 import { Encounter, SharedCase } from './types';
 import { useAuth } from './AuthContext';
 import { RANDOM_SAMPLE_CASES, getRandomSampleCase } from './data/sampleCases';
+import { 
+    getAllEncounters, 
+    putEncounter, 
+    deleteEncounter as deleteEncounterFromDB 
+} from './services/offlineDB';
+import { syncEngine } from './services/syncEngine';
+import { auditService } from './services/auditService';
 
 interface CaseContextType {
     encounters: Encounter[];
     sharedCases: SharedCase[];
     loading: boolean;
+    pendingSyncCount: number;
+    triggerManualSync: () => Promise<{ success: number; failed: number }>;
     createEncounter: (data: Partial<Encounter>) => Promise<string>;
     addRandomCase: (presetIndex?: number) => Promise<string>;
     updateEncounter: (id: string, data: Partial<Encounter>) => Promise<void>;
@@ -476,6 +485,19 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [encounters, setEncounters] = useState<Encounter[]>([]);
     const [sharedCases, setSharedCases] = useState<SharedCase[]>([]);
     const [loading, setLoading] = useState(true);
+    const [pendingSyncCount, setPendingSyncCount] = useState<number>(0);
+
+    // Subscribe to sync queue state
+    useEffect(() => {
+        const unsubscribe = syncEngine.subscribe(status => {
+            setPendingSyncCount(status.pendingCount);
+        });
+        return unsubscribe;
+    }, []);
+
+    const triggerManualSync = async () => {
+        return await syncEngine.processQueue();
+    };
 
     useEffect(() => {
         if (!user) {
@@ -485,9 +507,29 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return;
         }
 
-        // Initialize with local cache first to provide instant UI responsiveness
-        const local = getLocalEncounters();
-        setEncounters(local);
+        // 1. First check IndexedDB for offline-first instant retrieval
+        let isMounted = true;
+        const loadInitialData = async () => {
+            try {
+                const idbRecords = await getAllEncounters(user.uid);
+                if (isMounted && idbRecords && idbRecords.length > 0) {
+                    setEncounters(idbRecords);
+                    setLoading(false);
+                    return;
+                }
+            } catch (err) {
+                console.warn("[CaseContext] IndexedDB initial load notice:", err);
+            }
+
+            // Fallback to local storage
+            const local = getLocalEncounters();
+            if (isMounted) {
+                setEncounters(local);
+                setLoading(false);
+            }
+        };
+
+        loadInitialData();
 
         // If in guest mode, do not call Firestore
         if (user.uid === 'guest-clinician-id') {
@@ -495,7 +537,7 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return;
         }
 
-        // Listen to owned encounters from Firestore
+        // Listen to owned encounters from Firestore if online
         let unsubscribeOwned = () => {};
         let unsubscribeShared = () => {};
         let unsubscribeSharedRecords = () => {};
@@ -507,10 +549,12 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setEncounters(prev => {
                     const combined = [...data, ...prev.filter(e => e.ownerId !== user.uid)];
                     saveLocalEncounters(combined);
+                    // Mirror to IndexedDB
+                    combined.forEach(item => putEncounter(item).catch(() => {}));
                     return combined;
                 });
             }, (error) => {
-                console.warn("Firestore owned encounters sync notice:", error.message || error);
+                console.warn("Firestore owned encounters sync notice (operating in offline mode):", error.message || error);
             });
 
             // Listen to shared encounters
@@ -521,6 +565,7 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     const owned = prev.filter(e => e.ownerId === user.uid);
                     const combined = [...owned, ...data];
                     saveLocalEncounters(combined);
+                    combined.forEach(item => putEncounter(item).catch(() => {}));
                     return combined;
                 });
             }, (error) => {
@@ -536,11 +581,11 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 console.warn("Firestore shared cases sync notice:", error.message || error);
             });
         } catch (err) {
-            console.warn("Firestore initialization notice (using offline local storage):", err);
+            console.warn("Firestore initialization notice (operating completely offline):", err);
         }
 
-        setLoading(false);
         return () => {
+            isMounted = false;
             unsubscribeOwned();
             unsubscribeShared();
             unsubscribeSharedRecords();
@@ -572,62 +617,73 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             medicalReports: data.medicalReports || []
         };
 
-        // Always save locally immediately
+        // 1. Update React state immediately
         setEncounters(prev => {
             const updated = [newEncounter, ...prev];
             saveLocalEncounters(updated);
             return updated;
         });
 
-        // If authenticated with real Firebase user, also sync to Firestore in background
-        if (user.uid !== 'guest-clinician-id') {
-            try {
-                await addDoc(collection(db, 'encounters'), {
-                    ...newEncounter,
-                    id: undefined
-                });
-            } catch (error) {
-                console.warn("Firestore addDoc notice (case safely persisted locally):", error);
-            }
-        }
+        // 2. Persist to IndexedDB immediately (Offline-First)
+        await putEncounter(newEncounter).catch(() => {});
+
+        // 3. Log Immutable Clinical Audit Entry
+        await auditService.logEncounterCreated(newId, newEncounter.patientData.name);
+
+        // 4. Queue for Background Sync to Firestore
+        await syncEngine.queueMutation('create', 'encounter', newId, newEncounter);
 
         return newId;
     };
 
     const updateEncounter = async (id: string, data: Partial<Encounter>) => {
-        // Update locally immediately
+        let fullUpdatedEncounter: Encounter | null = null;
+
+        // 1. Update React state immediately
         setEncounters(prev => {
-            const updated = prev.map(e => e.id === id ? { ...e, ...data } : e);
+            const updated = prev.map(e => {
+                if (e.id === id) {
+                    fullUpdatedEncounter = { ...e, ...data };
+                    return fullUpdatedEncounter;
+                }
+                return e;
+            });
             saveLocalEncounters(updated);
             return updated;
         });
 
-        // Sync to Firestore if online
-        if (user && user.uid !== 'guest-clinician-id') {
-            try {
-                await updateDoc(doc(db, 'encounters', id), data);
-            } catch (error) {
-                console.warn("Firestore updateDoc notice (changes preserved locally):", error);
-            }
+        // 2. Persist to IndexedDB
+        if (fullUpdatedEncounter) {
+            await putEncounter(fullUpdatedEncounter).catch(() => {});
         }
+
+        // 3. Record Audit Trail
+        const updatedFields = Object.keys(data).filter(k => k !== 'id').join(', ');
+        await auditService.logEncounterUpdated(id, updatedFields || 'data');
+
+        // 4. Enqueue to Background Sync Engine
+        await syncEngine.queueMutation('update', 'encounter', id, fullUpdatedEncounter || data);
     };
 
     const deleteEncounter = async (id: string) => {
-        // Delete locally immediately
+        const encounterToDelete = encounters.find(e => e.id === id);
+        const patientName = encounterToDelete?.patientData?.name || 'Anonymous Patient';
+
+        // 1. Update React state immediately
         setEncounters(prev => {
             const updated = prev.filter(e => e.id !== id);
             saveLocalEncounters(updated);
             return updated;
         });
 
-        // Sync to Firestore if online
-        if (user && user.uid !== 'guest-clinician-id') {
-            try {
-                await deleteDoc(doc(db, 'encounters', id));
-            } catch (error) {
-                console.warn("Firestore deleteDoc notice:", error);
-            }
-        }
+        // 2. Delete from IndexedDB
+        await deleteEncounterFromDB(id).catch(() => {});
+
+        // 3. Record Audit Trail
+        await auditService.logEncounterDeleted(id, patientName);
+
+        // 4. Enqueue deletion to Sync Engine
+        await syncEngine.queueMutation('delete', 'encounter', id);
     };
 
     const shareCase = async (encounterId: string, doctorEmail: string, message?: string) => {
@@ -672,7 +728,18 @@ export const CaseProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     return (
-        <CaseContext.Provider value={{ encounters, sharedCases, loading, createEncounter, addRandomCase, updateEncounter, deleteEncounter, shareCase }}>
+        <CaseContext.Provider value={{ 
+            encounters, 
+            sharedCases, 
+            loading, 
+            pendingSyncCount,
+            triggerManualSync,
+            createEncounter, 
+            addRandomCase, 
+            updateEncounter, 
+            deleteEncounter, 
+            shareCase 
+        }}>
             {children}
         </CaseContext.Provider>
     );

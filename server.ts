@@ -4,6 +4,9 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import Stripe from "stripe";
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 import { keyPool } from "./api/geminiKeyPool";
 
 dotenv.config();
@@ -15,6 +18,25 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Security: HTTP headers
+  app.use(helmet({ contentSecurityPolicy: false }));
+
+  // Security: CORS
+  const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : ['http://localhost:3000'];
+  app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+  // Security: Rate limiting on API routes
+  const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 60, // 60 requests per minute per IP
+    message: { error: 'Too many requests. Please wait a moment before trying again.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use('/api/', apiLimiter);
 
   app.use(express.json({ limit: '20mb' }));
 

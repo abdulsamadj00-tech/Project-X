@@ -16,15 +16,17 @@
 
 ## ✨ Features
 
-- 🤖 **AI Differential Diagnosis** — Gemini AI generates ranked differential diagnoses with ICD-10 codes, supporting/contradicting evidence, and treatment suggestions
-- 💊 **Treatment Management** — Evidence-based medication recommendations with guideline citations
-- 📊 **Patient Dashboard** — Real-time patient case management with Firebase sync
-- 📈 **Progress Monitoring** — Daily progress notes with symptom score tracking and vitals history
-- 🔬 **AI Analysis Tab** — Personalized clinical insights and AI recommendations
-- 📄 **Report Generation** — PDF reports (comprehensive, discharge summary, referral, LAMA)
-- 👥 **Team Collaboration** — Multi-clinician case sharing with role-based access
-- 🌙 **Multi-Theme** — Midnight Cyan (dark), Ivory (light), and Sunset themes
-- 📱 **Fully Responsive** — Works on desktop, tablet, and mobile
+- ⚡ **100% Offline-Capable Core** — All patient records, emergency triage, lab trackers, treatment protocols, and PDF generation work seamlessly offline with IndexedDB storage and automatic background cloud sync
+- 🛡️ **Government-Grade Security & Audit Trail** — Immutable cryptographic audit logging, AES-256 field-level encryption, role-based access control (RBAC), Helmet security headers, and rate limiting
+- 🤖 **AI Differential Diagnosis (Online)** — Gemini AI generates ranked differential diagnoses with ICD-11 / ICD-10 dual-coding, evidence synthesis, and authoritative clinical guideline citations (ESC, AHA/ACC, IDSA, GOLD)
+- 💊 **Treatment Management & Safety Interceptor** — Evidence-based medication recommendations with active Drug-Drug Interaction (DDI) and allergy safety screening
+- 📊 **Patient Dashboard & Triage** — Emergency Severity Index (ESI 1-5) and NEWS2 scoring with real-time vitals monitoring
+- 🌐 **HL7 FHIR R4 Interoperability** — Export patient encounters in standard FHIR JSON format for electronic health record (EHR) integration
+- 📈 **Progress Monitoring** — Daily clinical progress notes with symptom score tracking and vitals trajectory
+- 🔬 **AI Analysis Tab** — Personalized clinical practice insights and quality assurance reports
+- 📄 **Bilingual PDF Report Studio** — Comprehensive clinical summaries, discharge notes, referral letters, and bilingual LAMA (English/Urdu) certificates
+- 👥 **Multi-Clinician Collaboration** — Secure role-based case sharing (Owner, Admin, Clinician, Nurse, MT, WardBoy)
+- 🌙 **Multi-Theme Clinical UI** — Midnight Cyan (dark), Ivory (light), and Sunset themes with high-contrast accessibility
 
 ---
 
@@ -144,6 +146,22 @@ Fill in patient data → Click **Generate AI Analysis** → Get ranked different
 
 ### Medication Suggestions
 Set a final diagnosis → Click **Suggest Medications** → Get AI-recommended drugs with dosages, rationale, and guideline references.
+
+---
+
+## 🏛️ Government & Institutional Procurement Readiness
+
+MediDx is architected to meet and exceed institutional and governmental healthcare procurement criteria:
+
+| Requirement Area | Specification / Standard | Implementation in MediDx |
+|------------------|--------------------------|--------------------------|
+| **Audit & Accountability** | NIST 800-53 / HIPAA §164.312(b) | Immutable audit log service with before/after state diffs, user ID, role, and ISO-8601 timestamps. One-click JSON export for regulatory compliance inspectors. |
+| **Data Encryption at Rest** | AES-256 GCM | Web Crypto API field-level encryption for sensitive Protected Health Information (PHI) in local storage and client-side database. |
+| **Offline-First Resilience** | Rural / Disaster / Remote Clinics | Production PWA Service Worker caching app shell. IndexedDB storage engine (`idb`) enables 100% of patient records, triage, labs, and reports to work without internet. Automatic background sync with conflict resolution when network restores. |
+| **Clinical Interoperability** | HL7 FHIR R4 Standard | Native FHIR JSON encounter resource generation and export for national hospital management system integration. |
+| **Clinical Standards** | WHO ICD-11 & ICD-10 | Dual diagnostic coding on all differential diagnoses with guideline attribution (ESC, AHA/ACC, IDSA, GOLD). |
+| **Server Security** | OWASP Top 10 Mitigation | Express server hardened with Helmet HTTP headers, CORS origin restrictions, and API rate limiting (60 req/min/IP). Client bundle is sanitized—no API keys baked in. |
+| **Role-Based Access Control** | Principle of Least Privilege | Multi-tier RBAC (`Owner`, `Admin`, `Clinician`, `Nurse`, `MT`, `WardBoy`) enforced client-side and in Firestore security rules. |
 
 ---
 

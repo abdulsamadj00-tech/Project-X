@@ -13,12 +13,33 @@ interface HeaderProps {
     onLogout: () => void;
     onSwitchAccount: () => void;
     onOpenAudit: () => void;
+    onOpenAuditTrail?: () => void;
     isSaving: boolean;
     isPro: boolean;
     role?: string;
+    isOnline?: boolean;
+    pendingSyncCount?: number;
+    onManualSync?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNavigate, onNewEncounter, onAddRandomCase, onOpenPricing, onLogout, onSwitchAccount, onOpenAudit, isSaving, isPro, role }) => {
+const Header: React.FC<HeaderProps> = ({ 
+    onOpenInsights, 
+    onOpenProfile, 
+    onNavigate, 
+    onNewEncounter, 
+    onAddRandomCase, 
+    onOpenPricing, 
+    onLogout, 
+    onSwitchAccount, 
+    onOpenAudit, 
+    onOpenAuditTrail,
+    isSaving, 
+    isPro, 
+    role,
+    isOnline = true,
+    pendingSyncCount = 0,
+    onManualSync
+}) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isAdmin = role === 'Owner' || role === 'Admin';
 
@@ -46,7 +67,32 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <nav className="hidden lg:flex items-center bg-primary-200/60 p-1 rounded-xl mr-4 border border-primary-300/30">
+                    {/* Offline / Online Network & Sync Status Badge */}
+                    <div className="flex items-center gap-2 mr-1">
+                        {isOnline ? (
+                            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-400 font-semibold" title="Device is online and syncing with cloud">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>Online</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] text-amber-300 font-bold shadow-[0_0_12px_rgba(245,158,11,0.2)]" title="Offline mode active. All patient records, triage, notes and calculations are saved locally.">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                                <span>⚡ Offline Ready</span>
+                            </div>
+                        )}
+
+                        {pendingSyncCount > 0 && (
+                            <button 
+                                onClick={onManualSync}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-[10px] text-cyan-300 font-bold transition-all active:scale-95 animate-pulse"
+                                title="Click to sync local modifications to cloud"
+                            >
+                                <span>⏳ {pendingSyncCount} pending sync</span>
+                            </button>
+                        )}
+                    </div>
+
+                    <nav className="hidden lg:flex items-center bg-primary-200/60 p-1 rounded-xl mr-3 border border-primary-300/30">
                         <button
                             onClick={() => handleNavigate('dashboard')}
                             className="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all hover:bg-primary-300/50 hover:text-brand-400 text-primary-600"
@@ -98,6 +144,17 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                             >
                                 <span className="text-sm">🎲</span>
                                 <span className="hidden md:inline">Random Case</span>
+                            </button>
+                        )}
+
+                        {onOpenAuditTrail && (
+                            <button
+                                onClick={onOpenAuditTrail}
+                                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-200/50 hover:bg-brand-500/10 text-[10px] font-black uppercase tracking-wider text-primary-800 border border-primary-300/40 hover:border-brand-500/30 transition-all shadow-sm"
+                                title="View cryptographic audit trail for government compliance inspection"
+                            >
+                                <span className="text-brand-400">🛡️</span>
+                                <span className="hidden lg:inline">Audit Trail</span>
                             </button>
                         )}
 
@@ -172,6 +229,15 @@ const Header: React.FC<HeaderProps> = ({ onOpenInsights, onOpenProfile, onNaviga
                                 <ChartBarIcon className="h-5 w-5 text-brand-400" />
                                 System Audit
                             </button>
+                            {onOpenAuditTrail && (
+                                <button 
+                                    onClick={() => { onOpenAuditTrail(); setIsMobileMenuOpen(false); }}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-primary-700 hover:bg-primary-200/50 transition-all"
+                                >
+                                    <span className="text-base">🛡️</span>
+                                    Compliance Audit Trail
+                                </button>
+                            )}
                             <button 
                                 onClick={onLogout}
                                 className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 transition-all"

@@ -136,11 +136,19 @@ const EncounterView: React.FC<EncounterViewProps> = ({ encounter: initialEncount
     }, [encounter.patientData, encounter.provisionalDiagnoses]);
 
     const handleGenerateDiagnoses = async () => {
+        // Enforce offline boundary: diagnosis generation requires internet
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+            toast.error("Offline Mode: AI Diagnosis generation requires active internet connection. All patient records, triage assessments, lab orders, and PDF reports remain fully accessible offline.");
+            setError("AI Diagnosis generation requires an active internet connection. Please reconnect to generate AI differentials. All other clinical data recording features are available offline.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         try {
             const result = await generateDiagnoses(encounter.patientData, 'C'); // Assuming Celsius for now
             setEncounter(prev => ({ ...prev, provisionalDiagnoses: result }));
+            toast.success(`Generated ${result.length} evidence-based differential diagnoses.`);
             setActiveTab('treatment'); // Move to next logical tab
         } catch (err: any) {
             setError(err?.message || 'Failed to generate diagnosis. Please check patient symptoms and try again.');

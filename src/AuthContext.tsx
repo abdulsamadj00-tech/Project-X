@@ -13,6 +13,7 @@ import {
     updateDoc 
 } from './firebase';
 import { DoctorProfile } from './types';
+import { auditService } from './services/auditService';
 
 interface AuthContextType {
     user: User | null;
@@ -67,6 +68,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
 
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (user && profile) {
+            auditService.setUserContext(user.uid, profile.name || user.displayName || 'Doctor', profile.role || 'Clinician');
+        }
+    }, [user, profile]);
 
     useEffect(() => {
         // Listen to Firebase auth changes if the user signs in with Google

@@ -49,6 +49,19 @@
           el.innerText += (e.message || e) + '\n';
         }
       });
+
+      // Register Production Service Worker for 100% Offline Support
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(reg) {
+              console.log('[MediDx] Offline ServiceWorker active with scope:', reg.scope);
+            })
+            .catch(function(err) {
+              console.warn('[MediDx] ServiceWorker registration notice:', err);
+            });
+        });
+      }
     </script>
     <script type="module" src="/src/index.tsx"></script>
   </body>
